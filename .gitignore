@@ -134,7 +134,6 @@ dmypy.json
 
 # ignore all notebooks
 *.ipynb
-!algonauts_2023_challenge_tutorial.ipynb
 
 # ignore all txt file except requirements.txt
 *.txt
