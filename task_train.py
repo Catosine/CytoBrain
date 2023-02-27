@@ -18,7 +18,7 @@ import torch.utils.data as data
 import torchvision
 
 from dataset import Algonauts2023Raw
-from utils import argParse, initialize
+from utils import train_argParse, initialize
 
 
 def main(args):
@@ -46,11 +46,13 @@ def main(args):
         raise NotImplemented
 
     model.to(args.device)
-    logging.info("Model initialized. Loaded to <{}> device.".format(args.device))
+    logging.info(
+        "Model initialized. Loaded to <{}> device.".format(args.device))
 
     # setup optimizer & scheduler
     optimizer = optim.SGD(model.parameters(), lr=args.lr)
-    scheduler = optim.lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
+    scheduler = optim.lr_scheduler.LinearLR(
+        optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
 
     print(model)
 
@@ -67,5 +69,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = argParse()
+    args = train_argParse()
     main(args)

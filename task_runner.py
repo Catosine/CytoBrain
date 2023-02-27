@@ -23,7 +23,6 @@ class TaskRunner:
     """
 
     def __init__(self, model, criterion, scoring_fn, optimizer, scheduler, summarywriter, logging):
-
         """
             Initialize the trainer
         """
@@ -36,7 +35,6 @@ class TaskRunner:
         self.summarywriter = summarywriter
         self.logging = logging
 
-    
     def train_and_val(self, train_set, val_set, epoch=100, batch_size=64, k_fold=5, report_step=20, save_path=None):
         """
             Standard Training and validation
@@ -52,13 +50,9 @@ class TaskRunner:
                 save_path,          str, save path for best model & per epoch model
         """
 
-
-
         pass
 
-
     def kfold_train_and_val(self, dataset, epoch=100, batch_size=64, k_fold=5, report_step=20, save_path=None):
-
         """
             K-Fold Training and validation
 
@@ -85,7 +79,8 @@ class TaskRunner:
         self.logging.info("Per Fold #Samples: {}".format(segment))
 
         for e in tqdm(range(epoch)):
-            self.logging.info("==============<Epoch#{}>==============".format(e))
+            self.logging.info(
+                "==============<Epoch#{}>==============".format(e))
 
             i = e % k_fold
 
@@ -105,20 +100,27 @@ class TaskRunner:
             # train
             avg_train_loss, avg_train_score = self.__epoch_train(e, data.dataset.Subset(dataset, train_idx), batch_size,
                                                                  report_step=report_step)
-            self.logging.info("Average Training Loss @Epoch#{}: {}".format(e, avg_train_loss))
-            self.logging.info("Average Training Score @Epoch#{}: {}".format(e, avg_train_score))
+            self.logging.info(
+                "Average Training Loss @Epoch#{}: {}".format(e, avg_train_loss))
+            self.logging.info(
+                "Average Training Score @Epoch#{}: {}".format(e, avg_train_score))
 
             # validate
-            avg_val_loss, avg_val_score = self.__epoch_val(e, data.dataset.Subset(dataset, val_idx), batch_size)
-            self.logging.info("Average Validation Loss @Epoch#{}: {}".format(e, avg_val_loss))
-            self.logging.info("Average Validation Score @Epoch#{}: {}".format(e, avg_val_score))
+            avg_val_loss, avg_val_score = self.__epoch_val(
+                e, data.dataset.Subset(dataset, val_idx), batch_size)
+            self.logging.info(
+                "Average Validation Loss @Epoch#{}: {}".format(e, avg_val_loss))
+            self.logging.info(
+                "Average Validation Score @Epoch#{}: {}".format(e, avg_val_score))
 
             if save_path:
-                torch.save(self.model.state_dict(), osp.join(save_path, "checkpoint_epoch_{}.pth".format(e)))
+                torch.save(self.model.state_dict(), osp.join(
+                    save_path, "checkpoint_epoch_{}.pth".format(e)))
 
                 if avg_val_score > best_score:
                     self.logging.info("New best model found.")
-                    torch.save(self.model.state_dict(), osp.join(save_path, "checkpoint_best.pth"))
+                    torch.save(self.model.state_dict(), osp.join(
+                        save_path, "checkpoint_best.pth"))
 
         self.logging.info("Done.")
 
@@ -151,7 +153,6 @@ class TaskRunner:
         return pred.detach(), score.mean().detach(), loss.detach()
 
     def __epoch_train(self, epoch, dataset, batch_size=64, num_workers=4, report_step=20):
-
         """
             Per epoch train method
 
@@ -161,14 +162,15 @@ class TaskRunner:
                 batch_size,         int, batch size
                 num_workers,        int, num of worker for dataloader initialization
                 report_step,        int, logging report step
-            
+
             Returns:
                 avg_batch_loss,     np.float32, the averaged batch loss
                 avg_batch_score,    np.float32, the averaged batch score
         """
 
         # init dataloader
-        dataloader = data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        dataloader = data.DataLoader(
+            dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
         per_batch_loss = list()
         per_batch_score = list()
@@ -193,7 +195,6 @@ class TaskRunner:
         return np.array(per_batch_loss).mean(), np.array(per_batch_score).mean()
 
     def __epoch_val(self, epoch, dataset, batch_size=64, num_workers=4):
-
         """
             Per epoch val method
 
@@ -202,14 +203,15 @@ class TaskRunner:
                 dataset,            torch.utils.data.Dataset object
                 batch_size,         int, batch size
                 num_workers,        int, num of worker for dataloader initialization
-            
+
             Returns:
                 avg_batch_loss,     np.float32, the averaged batch loss
                 avg_batch_score,    np.float32, the averaged batch score
         """
 
         # init dataloader
-        dataloader = data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        dataloader = data.DataLoader(
+            dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
         per_batch_loss = list()
         per_batch_score = list()
@@ -229,7 +231,6 @@ class TaskRunner:
         return np.array(per_batch_loss).mean(), np.array(per_batch_score).mean()
 
     def infer(self, dataset, batch_size=64, num_workers=4):
-
         """
             Inferring on given dataset
 
@@ -244,7 +245,8 @@ class TaskRunner:
         """
 
         # init dataloader
-        dataloader = data.DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+        dataloader = data.DataLoader(
+            dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
         results = list()
 

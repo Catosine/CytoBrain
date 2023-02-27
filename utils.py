@@ -20,32 +20,72 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 
-def argParse():
-    parser = argparse.ArgumentParser()
+def __base_argParse(parser):
+
     parser.add_argument("--data", type=str, default="/Users/cytosine/Documents/Algonauts2023/data",
                         help="Path to Algonauts2023 dataset")
     parser.add_argument("--subject", type=str, default="subj01",
-                        choices=["subj01", "subj02", "subj03", "subj04", "subj05", "subj06", "subj07", "subj08"],
+                        choices=["subj01", "subj02", "subj03", "subj04",
+                                 "subj05", "subj06", "subj07", "subj08"],
                         help="Used to select which subject to learn")
+    parser.add_argument("--model", type=str, default="resnet50",
+                        choices=["resnet50"], help="Select different models")
+    parser.add_argument("--batch_size", type=int,
+                        default=64, help="Batch size")
+    parser.add_argument("--seed", type=int, default=1001, help="Random seed")
+
+    parser.add_argument("--note", type=str, help="Note.")
+
+    return parser
+
+
+def __train_argParse(parser):
+
     parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
                         help="Select which half of the brain to model")
-    parser.add_argument("--model", type=str, default="resnet50", choices=["resnet50"], help="Select different models")
-    # parser.add_argument("--pretrained_weight", type=str, help="Path to pretrained weight")
-    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
-    parser.add_argument("--kfold", type=int, default=5, help="KFold for cross validation")
-    parser.add_argument("--epoch", type=int, default=100, help="Epoch number to train the model")
+
+    parser.add_argument("--kfold", type=int, default=5,
+                        help="KFold for cross validation")
+    parser.add_argument("--epoch", type=int, default=100,
+                        help="Epoch number to train the model")
 
     parser.add_argument("--lr", type=float, default=0.05, help="Learning rate")
 
-    parser.add_argument("--seed", type=int, default=1001, help="Random seed")
+    parser.add_argument("--report_step", type=int, default=100,
+                        help="Num of report steps for logging")
 
-    parser.add_argument("--report_step", type=int, default=100, help="Num of report steps for logging")
-    parser.add_argument("--save_path", type=str, default="./logs", help="Path to save training logs and models")
-    parser.add_argument("--note", type=str, help="Note for training.")
+    parser.add_argument("--save_path", type=str, default="./logs",
+                        help="Path to save training logs and models")
 
-    parser.add_argument("--inference", action="store_true", help="Run inference script.")
+    return parser
 
-    # parser.add_argument("--config", type=str, help="Path of a json defined configuration. Can be used to save time.")
+
+def __infer_argParse(parser):
+
+    parser.add_argument("--pretrained_weight", type=str,
+                        help="Path to pretrained weight")
+    parser.add_argument("--save_path", type=str, default="./prediction",
+                        help="Path to save training logs and models")
+
+    return parser
+
+
+def train_argParse():
+
+    parser = argparse.ArgumentParser()
+
+    parser = __base_argParse(parser)
+    parser = __train_argParse(parser)
+
+    return parser.parse_args()
+
+
+def infer_argParse():
+
+    parser = argparse.ArgumentParser()
+
+    parser = __base_argParse(parser)
+    parser = __infer_argParse(parser)
 
     return parser.parse_args()
 
