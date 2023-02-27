@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-./**/__pycache__/
+/**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -134,7 +134,11 @@ dmypy.json
 
 # ignore all notebooks
 *.ipynb
+!algonauts_2023_challenge_tutorial.ipynb
 
 # ignore all txt file except requirements.txt
 *.txt
 !requirements.txt
+
+# ignore training logs
+logs
