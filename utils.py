@@ -43,6 +43,8 @@ def argParse():
     parser.add_argument("--save_path", type=str, default="./logs", help="Path to save training logs and models")
     parser.add_argument("--note", type=str, help="Note for training.")
 
+    parser.add_argument("--inference", action="store_true", help="Run inference script.")
+
     # parser.add_argument("--config", type=str, help="Path of a json defined configuration. Can be used to save time.")
 
     return parser.parse_args()

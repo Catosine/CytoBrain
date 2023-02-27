@@ -17,9 +17,9 @@ import torch.utils.data as data
 from tqdm import tqdm
 
 
-class Trainer:
+class TaskRunner:
     """
-        Trainer
+        Task runner. Including train/validate/infer
     """
 
     def __init__(self, model, criterion, scoring_fn, optimizer, scheduler, summarywriter, logging):
@@ -36,6 +36,27 @@ class Trainer:
         self.summarywriter = summarywriter
         self.logging = logging
 
+    
+    def train_and_val(self, train_set, val_set, epoch=100, batch_size=64, k_fold=5, report_step=20, save_path=None):
+        """
+            Standard Training and validation
+
+            Args:
+                dataset,            torch.utils.dataset.data.Dataset, the dataset
+                summarywriter,      torch.utils.tensorboard.SummaryWriter, tensorboard summary writer
+                logging,            logger
+                epoch,              int, maximized training epoch
+                batch_size,         int, batch size
+                k_fold,             int, fold number. For every epoch, the dataset will be split into K portion 
+                                        and use K-1 of them to train and the rest for validation.
+                save_path,          str, save path for best model & per epoch model
+        """
+
+
+
+        pass
+
+
     def kfold_train_and_val(self, dataset, epoch=100, batch_size=64, k_fold=5, report_step=20, save_path=None):
 
         """
@@ -51,6 +72,8 @@ class Trainer:
                                         and use K-1 of them to train and the rest for validation.
                 save_path,          str, save path for best model & per epoch model
         """
+
+        best_score = -1
 
         self.logging.info("Start {}-Fold training.".format(k_fold))
 
@@ -90,7 +113,12 @@ class Trainer:
             self.logging.info("Average Validation Loss @Epoch#{}: {}".format(e, avg_val_loss))
             self.logging.info("Average Validation Score @Epoch#{}: {}".format(e, avg_val_score))
 
-            torch.save(self.model.state_dict(), osp.join(save_path, "checkpoint_epoch_{}.pth".format(e)))
+            if save_path:
+                torch.save(self.model.state_dict(), osp.join(save_path, "checkpoint_epoch_{}.pth".format(e)))
+
+                if avg_val_score > best_score:
+                    self.logging.info("New best model found.")
+                    torch.save(self.model.state_dict(), osp.join(save_path, "checkpoint_best.pth"))
 
         self.logging.info("Done.")
 
