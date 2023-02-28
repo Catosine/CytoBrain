@@ -1,12 +1,12 @@
 # CytoBrain
 
-This is the repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
+This is a **personal** repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
 Developed by [@Cytosine](https://github.com/Catosine)
 
 ## ToDos
 ### 0. Preparation
 - [x] Dataset
-- [ ] Training Script
+- [x] Training Script
 - [ ] Inference Script
 
 ### 1. End2End Model 
