@@ -138,7 +138,8 @@ class NNTrainer:
 
         return pred.detach(), score.mean().detach(), loss.detach()
 
-    def infer(self, dataset, batch_size=64, num_workers=4):
+    @staticmethod
+    def infer(model, dataset, batch_size=64, num_workers=4):
         """
             Inferring on given dataset
 
@@ -159,10 +160,10 @@ class NNTrainer:
         results = list()
 
         for img, _ in tqdm(dataloader):
-            self.model.eval()
+            model.eval()
 
             with torch.no_grad():
-                pred = self.model(img)
+                pred = model(img)
                 results.append(pred.detach())
 
         return torch.stack(results).numpy()

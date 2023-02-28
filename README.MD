@@ -3,10 +3,17 @@
 This is a **personal** repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
 Developed by [@Cytosine](https://github.com/Catosine)
 
+## Quick Start
+```Bash
+    # To start a training
+    python task_train.py --data ./data --subject subj01
+```
+
 ## ToDos
 ### 0. Preparation
 - [x] Dataset
 - [x] Training Script
+- [ ] Feature Extraction Script
 - [ ] Inference Script
 
 ### 1. End2End Model 

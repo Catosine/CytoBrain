@@ -18,10 +18,14 @@ import time
 
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.dataset import Subset
 import torch.optim as optim
+import torchvision
+import torchvision.transforms as transforms
 
+from constant import TRAIN_MEAN, TRAIN_STD
 
 def __base_argParse(parser):
 
@@ -31,8 +35,10 @@ def __base_argParse(parser):
                         choices=["subj01", "subj02", "subj03", "subj04",
                                  "subj05", "subj06", "subj07", "subj08"],
                         help="Used to select which subject to learn")
+    parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
+                        help="Select which half of the brain to model")
     parser.add_argument("--model", type=str, default="resnet50",
-                        choices=["resnet50"], help="Select different models")
+                        choices=["resnet18", "resnet50"], help="Select different models")
     parser.add_argument("--batch_size", type=int,
                         default=64, help="Batch size")
     parser.add_argument("--seed", type=int, default=1001, help="Random seed")
@@ -44,16 +50,14 @@ def __base_argParse(parser):
 
 def __train_argParse(parser):
 
-    parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
-                        help="Select which half of the brain to model")
-
     parser.add_argument("--train_ratio", type=float, default=0.8,
                         help="Train/Dev set ratio")
     parser.add_argument("--epoch", type=int, default=100,
                         help="Epoch number to train the model")
 
     parser.add_argument("--lr", type=float, default=0.05, help="Learning rate")
-    parser.add_argument("--lr_regressor", type=float, help="Learing rate for regressor")
+    parser.add_argument("--lr_regressor", type=float,
+                        help="Learing rate for regressor")
 
     parser.add_argument("--report_step", type=int, default=100,
                         help="Num of report steps for logging")
@@ -70,6 +74,7 @@ def __infer_argParse(parser):
                         help="Path to pretrained weight")
     parser.add_argument("--save_path", type=str, default="./prediction",
                         help="Path to save training logs and models")
+    parser.add_argument("--output_size", type=int, default=2048, help="Output size of pretrained model")
 
     return parser
 
@@ -97,7 +102,8 @@ def infer_argParse():
 def train_dev_split(dset, train_ratio=0.8):
 
     total_size = len(dset)
-    train_idx = np.random.choice(total_size, int(total_size * train_ratio), replace=False)
+    train_idx = np.random.choice(total_size, int(
+        total_size * train_ratio), replace=False)
     dev_idx = np.ones(total_size)
     dev_idx[train_idx] = 0
     dev_idx = np.argwhere(dev_idx).reshape(-1)
@@ -105,7 +111,8 @@ def train_dev_split(dset, train_ratio=0.8):
     return Subset(dset, train_idx), Subset(dset, dev_idx)
 
 
-def initialize(args):
+def __common_initialize(args):
+
     # set random seed
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
@@ -116,6 +123,15 @@ def initialize(args):
     # setup logs dir
     if not osp.isdir(args.save_path):
         os.mkdir(args.save_path)
+
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    return args
+
+
+def train_initialize(args):
+
+    __common_initialize(args)
 
     timestamp = time.strftime("%Y%m%d%H%M%S")
     args.save_path = osp.join(args.save_path, "{timestamp}_{subj}_{hemisphere}_{model}_rs{rs}".format(
@@ -135,7 +151,21 @@ def initialize(args):
     fh.setFormatter(logging.Formatter(time_format))
     logging.getLogger().addHandler(fh)
 
-    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return args
+
+
+def inference_initialize(args):
+
+    __common_initialize(args)
+
+    args.save_path = osp.join(args.save_path, "{subj}_{hemisphere}_{model}".format(
+        subj=args.subject, hemisphere=args.hemisphere, 
+        model=args.pretrained_weight.split("/")[-1].split(".")[0]))
+    if args.note:
+        args.save_path += "_{}".format(args.note)
+
+    if not osp.isdir(args.save_path):
+        os.mkdir(args.save_path)
 
     return args
 
@@ -173,3 +203,46 @@ def build_optimizer(model, lr, lr_regressor):
     optimizer = optim.AdamW(optimizer_grouped_parameters)
 
     return optimizer
+
+
+def build_model(model, output_size, pretrained=None):
+
+    if model == "resnet18":
+        model = torchvision.models.resnet18()
+        model.fc = nn.Sequential(
+            nn.Linear(in_features=512, out_features=4096, bias=True),
+            nn.Linear(in_features=4096, out_features=8192, bias=True),
+            nn.Linear(in_features=8192, out_features=output_size, bias=True)
+        )
+    elif model == "resnet50":
+        model = torchvision.models.resnet50()
+        model.fc = nn.Sequential(
+            nn.Linear(in_features=2048, out_features=4096, bias=True),
+            nn.Linear(in_features=4096, out_features=8192, bias=True),
+            nn.Linear(in_features=8192, out_features=output_size, bias=True)
+        )
+    else:
+        raise NotImplemented
+    
+    if pretrained:
+        model.load_state_dict(torch.load(pretrained))
+
+    return model
+
+
+def build_transform(subj):
+
+    """
+        Build transform as preprocessing
+    """
+
+    tf = list()
+
+    tf += [
+        transforms.ToTensor(),
+        transforms.Normalize(TRAIN_MEAN[subj], TRAIN_STD[subj])
+    ]
+
+    tf = transforms.Compose(tf)
+
+    return tf
