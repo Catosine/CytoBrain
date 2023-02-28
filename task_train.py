@@ -14,11 +14,12 @@ import os.path as osp
 
 import torch.nn as nn
 import torch.optim as optim
-import torch.utils.data as data
 import torchvision
+from torchmetrics import SpearmanCorrCoef
 
 from dataset import Algonauts2023Raw
-from utils import train_argParse, initialize
+from utils import train_argParse, initialize, train_dev_split, build_optimizer
+from trainer import NNTrainer
 
 
 def main(args):
@@ -28,9 +29,15 @@ def main(args):
     logging.info(args)
 
     # load dataset
-    train_set = Algonauts2023Raw(osp.join(args.data, args.subject))
-    logging.info("Training data <{}> loaded.".format(args.subject))
-    logging.info("Total samples: {}".format(len(train_set)))
+    dataset = Algonauts2023Raw(osp.join(args.data, args.subject))
+    logging.info("Dataset <{}> loaded.".format(args.subject))
+
+    # split train & dev set
+    train_set, dev_set = train_dev_split(dataset, args.train_ratio)
+
+    logging.info("#Total: {}".format(len(dataset)))
+    logging.info("#Train: {}".format(len(train_set)))
+    logging.info("#Dev: {}".format(len(dev_set)))
     fmri_size = train_set[0][1].shape[0]
     logging.info("Hemisphere FMRI size: {}".format(fmri_size))
 
@@ -50,23 +57,21 @@ def main(args):
         "Model initialized. Loaded to <{}> device.".format(args.device))
 
     # setup optimizer & scheduler
-    optimizer = optim.SGD(model.parameters(), lr=args.lr)
+    optimizer = build_optimizer(model, args.lr, args.lr_regressor)
     scheduler = optim.lr_scheduler.LinearLR(
         optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
+    
+    # setup scoring function
+    scoring_fn = SpearmanCorrCoef()
 
-    print(model)
+    # setup criterion
+    criterion = nn.MSELoss()
 
-    for i, f in data.DataLoader(train_set, batch_size=8):
-        print(i)
-        print(f)
-        print(i.shape)
-        print(f.shape)
-        print(type(i))
-        print(type(f))
-        break
+    # initializing trainer
+    trainer = NNTrainer(model, criterion, scoring_fn, optimizer, scheduler, args.summarywriter, logging, args.save_path)
 
-    pass
-
+    # start training
+    trainer.run(train_set, dev_set, args.epoch, args.batch_size, args.report_step)
 
 if __name__ == "__main__":
     args = train_argParse()

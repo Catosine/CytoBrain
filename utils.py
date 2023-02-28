@@ -16,8 +16,11 @@ import os.path as osp
 import sys
 import time
 
+import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data.dataset import Subset
+import torch.optim as optim
 
 
 def __base_argParse(parser):
@@ -44,12 +47,13 @@ def __train_argParse(parser):
     parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
                         help="Select which half of the brain to model")
 
-    parser.add_argument("--kfold", type=int, default=5,
-                        help="KFold for cross validation")
+    parser.add_argument("--train_ratio", type=float, default=0.8,
+                        help="Train/Dev set ratio")
     parser.add_argument("--epoch", type=int, default=100,
                         help="Epoch number to train the model")
 
     parser.add_argument("--lr", type=float, default=0.05, help="Learning rate")
+    parser.add_argument("--lr_regressor", type=float, help="Learing rate for regressor")
 
     parser.add_argument("--report_step", type=int, default=100,
                         help="Num of report steps for logging")
@@ -90,6 +94,17 @@ def infer_argParse():
     return parser.parse_args()
 
 
+def train_dev_split(dset, train_ratio=0.8):
+
+    total_size = len(dset)
+    train_idx = np.random.choice(total_size, int(total_size * train_ratio), replace=False)
+    dev_idx = np.ones(total_size)
+    dev_idx[train_idx] = 0
+    dev_idx = np.argwhere(dev_idx).reshape(-1)
+
+    return Subset(dset, train_idx), Subset(dset, dev_idx)
+
+
 def initialize(args):
     # set random seed
     torch.manual_seed(args.seed)
@@ -123,3 +138,38 @@ def initialize(args):
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     return args
+
+
+def build_optimizer(model, lr, lr_regressor):
+
+    lr_regressor = lr_regressor if lr_regressor else lr
+
+    param_optimizer = list(model.named_parameters())
+    no_decay = ['bias', 'gamma', 'beta']
+    regressor_param = list()
+    regressor_param_no_decay = list()
+    backbone_param = list()
+    backbone_param_no_decay = list()
+    for n, p in param_optimizer:
+        if n.startswith(("fc")):
+            if not any(nd in n for nd in no_decay):
+                regressor_param.append(p)
+            else:
+                regressor_param_no_decay.append(p)
+        else:
+            if not any(nd in n for nd in no_decay):
+                backbone_param.append(p)
+            else:
+                backbone_param_no_decay.append(p)
+
+    optimizer_grouped_parameters = [
+        {'params': backbone_param, 'weight_decay_rate': 0.01, "lr": lr},
+        {'params': backbone_param_no_decay, 'weight_decay_rate': 0.0, "lr": lr},
+        {'params': regressor_param, 'weight_decay_rate': 0.01, "lr": lr_regressor},
+        {'params': regressor_param_no_decay,
+            'weight_decay_rate': 0.0, "lr": lr_regressor}
+    ]
+
+    optimizer = optim.AdamW(optimizer_grouped_parameters)
+
+    return optimizer
