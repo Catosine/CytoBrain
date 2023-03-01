@@ -3,3 +3,4 @@ pytorch==1.13.1
 torchmetrics==0.11.1
 torchvision==0.14.1
 opencv==4.7.0
+tqdm
