@@ -16,7 +16,6 @@ import re
 import cv2
 import numpy as np
 from torch.utils.data import Dataset
-from tqdm import tqdm
 
 
 class Algonauts2023Raw(Dataset):
@@ -105,6 +104,7 @@ if __name__ == "__main__":
     nimages = 0
     mean = 0.
     std = 0.
+    from tqdm import tqdm
     for batch, _ in tqdm(dataloader):
 
         # Rearrange batch to be the shape of [B, C, W * H]

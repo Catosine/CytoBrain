@@ -253,3 +253,41 @@ def build_transform(subj, train=True):
     tf = transforms.Compose(tf)
 
     return tf
+
+
+def compute_pearson(pred, target):
+    
+    """
+        Compute pearson correlation coefficient
+
+        Args:
+            pred,           torch.Tensor, prediction
+            target,         torch.Tensor, target
+    """
+
+    pearson = torch.corrcoef(torch.concat([pred, target]))
+    size = pred.size(0)
+    mask = [[False for _ in range(size*2)] for _ in range(size*2)]
+
+    for i in range(size):
+        mask[i][i+size] = True
+
+    pearson = pearson[mask]
+
+    return pearson
+
+
+if __name__ == "__main__":
+
+    a = torch.rand(16, 128)
+    b = torch.rand(16, 128)
+
+    print(torch.concat([a, b]).shape)
+
+    res = compute_pearson(a, b)
+
+    for i, (x, y) in enumerate(zip(a, b)):
+
+        print("Computed: {} Torch.corrcoef: {}".format(
+            res[i], torch.corrcoef(torch.stack([x, y]))[0, 1]))
+

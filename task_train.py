@@ -14,10 +14,9 @@ import os.path as osp
 
 import torch.nn as nn
 import torch.optim as optim
-from torchmetrics.functional import spearman_corrcoef
 
 from dataset import Algonauts2023Raw
-from utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform
+from utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
 from trainer import NNTrainer
 
 
@@ -52,7 +51,7 @@ def main(args):
         optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
 
     # setup scoring function
-    scoring_fn = spearman_corrcoef
+    scoring_fn = compute_pearson
 
     # setup criterion
     criterion = nn.MSELoss()
