@@ -14,7 +14,7 @@ import os.path as osp
 import numpy as np
 
 from dataset import Algonauts2023Raw
-from utils import infer_argParse, inference_initialize, build_model
+from utils import infer_argParse, inference_initialize, build_model, build_transform
 from trainer import NNTrainer
 
 def main(args):
@@ -24,7 +24,7 @@ def main(args):
     print(args)
 
     # load dataset
-    dataset = Algonauts2023Raw(osp.join(args.data, args.subject), train=False)
+    dataset = Algonauts2023Raw(osp.join(args.data, args.subject), train=False, transform=build_transform(args.subject, False))
     print("#Total: {}".format(len(dataset)))
     print("Predicted FMRI size: {}".format(args.output_size))
 
@@ -38,7 +38,7 @@ def main(args):
     print("Start inferencing")
     output = NNTrainer.infer(model, dataset, args.batch_size)
 
-    np.save(osp.join(args.save_path, "l" if args.hemishpere == "L" else "r" + "h_pred_test.npy"), output.astype(np.float32))
+    np.save(osp.join(args.save_path, args.hemishpere.lower() + "h_pred_test.npy"), output.astype(np.float32))
     print("prediction saved.")
 
 if __name__ == "__main__":

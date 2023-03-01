@@ -116,7 +116,7 @@ class NNTrainer:
 
         pred = self.model(img)
         loss = self.criterion(pred, fmri)
-        score = self.scoring_fn(pred, fmri)
+        score = self.scoring_fn(pred.T, fmri.T)
 
         loss.backward()
 
@@ -134,7 +134,7 @@ class NNTrainer:
         with torch.no_grad():
             pred = self.model(img)
             loss = self.criterion(pred, fmri)
-            score = self.scoring_fn(pred, fmri)
+            score = self.scoring_fn(pred.T, fmri.T)
 
         return pred.detach(), score.mean().detach(), loss.detach()
 

@@ -79,17 +79,23 @@ class Algonauts2023Raw(Dataset):
         img_idx = int(re.findall("\d{4}", img_file)[0]) - 1
 
         img = cv2.imread(osp.join(self.image_path, img_file)).astype(np.float32)
-        img = img.reshape(img.shape[2],img.shape[0],img.shape[1])
         
         if self.transform:
             img = self.transform(img)
+        
+        #img = img.reshape(img.shape[2], img.shape[0], img.shape[1])
 
         return img, self.fmri[img_idx] if self.train else 0
 
 
 if __name__ == "__main__":
+
+    from utils import build_transform
+
     dataset = Algonauts2023Raw(
-        "/Users/cytosine/Documents/Algonauts2023/data/subj08", train=False)
+        "/Users/cytosine/Documents/Algonauts2023/data/subj08", train=False, transform=build_transform("subj08"))
+    
+
     print("Successfully loaded")
 
     from torch.utils.data import DataLoader
@@ -100,6 +106,7 @@ if __name__ == "__main__":
     mean = 0.
     std = 0.
     for batch, _ in tqdm(dataloader):
+
         # Rearrange batch to be the shape of [B, C, W * H]
         batch = batch.view(batch.size(0), batch.size(1), -1)
         # Update total number of images

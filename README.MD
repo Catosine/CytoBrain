@@ -14,7 +14,7 @@ Developed by [@Cytosine](https://github.com/Catosine)
 - [x] Dataset
 - [x] Training Script
 - [ ] Feature Extraction Script
-- [ ] Inference Script
+- [x] Inference Script
 
 ### 1. End2End Model 
 - ResNet50 + 3 of FCN

@@ -14,10 +14,10 @@ import os.path as osp
 
 import torch.nn as nn
 import torch.optim as optim
-from torchmetrics import SpearmanCorrCoef
+from torchmetrics.functional import spearman_corrcoef
 
 from dataset import Algonauts2023Raw
-from utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model
+from utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform
 from trainer import NNTrainer
 
 
@@ -28,7 +28,8 @@ def main(args):
     logging.info(args)
 
     # load dataset
-    dataset = Algonauts2023Raw(osp.join(args.data, args.subject))
+    dataset = Algonauts2023Raw(osp.join(
+        args.data, args.subject), args.hemisphere, build_transform(args.subject))
     logging.info("Dataset <{}> loaded.".format(args.subject))
 
     # split train & dev set
@@ -51,7 +52,7 @@ def main(args):
         optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
 
     # setup scoring function
-    scoring_fn = SpearmanCorrCoef()
+    scoring_fn = spearman_corrcoef
 
     # setup criterion
     criterion = nn.MSELoss()

@@ -25,7 +25,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from constant import TRAIN_MEAN, TRAIN_STD
+from constant import TRAIN_MEAN, TRAIN_STD, TEST_MEAN, TEST_STD
 
 def __base_argParse(parser):
 
@@ -230,18 +230,25 @@ def build_model(model, output_size, pretrained=None):
     return model
 
 
-def build_transform(subj):
+def build_transform(subj, train=True):
 
     """
         Build transform as preprocessing
     """
 
-    tf = list()
+    mean = TRAIN_MEAN[subj] if train else TEST_MEAN[subj]
+    std = TRAIN_STD[subj] if train else TEST_STD[subj]
 
-    tf += [
-        transforms.ToTensor(),
-        transforms.Normalize(TRAIN_MEAN[subj], TRAIN_STD[subj])
-    ]
+    tf = [transforms.ToTensor()]
+
+    if train:
+        tf += [
+            transforms.Pad(64),
+            transforms.RandomCrop(size=(425)),
+            transforms.RandomHorizontalFlip(),
+        ]
+
+    tf.append(transforms.Normalize(mean, std))
 
     tf = transforms.Compose(tf)
 
