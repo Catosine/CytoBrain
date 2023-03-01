@@ -55,7 +55,7 @@ dependencies:
   - cairo=1.16.0=h73a0509_1014
   - certifi=2022.12.7=pyhd8ed1ab_0
   - cffi=1.15.1=py39h7e6b969_3
-  - chardet=3.0.4=py_1
+  - chardet=4.0.0=py39h2804cbe_3
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
   - click=8.0.3=pyhd3eb1b0_0
   - cryptography=39.0.1=py39he2a39a8_0
@@ -76,7 +76,7 @@ dependencies:
   - google-auth=1.33.0=pyhd3eb1b0_0
   - google-auth-oauthlib=0.4.1=py_2
   - graphite2=1.3.13=h9f76cd9_1001
-  - grpcio=1.52.1=py39h23fbdae_0
+  - grpcio=1.52.1=py39h23fbdae_1
   - harfbuzz=6.0.0=hddbc195_0
   - hdf5=1.14.0=nompi_h6b85c65_102
   - icu=70.1=h6b3803e_0
@@ -94,7 +94,7 @@ dependencies:
   - libblas=3.9.0=16_osxarm64_openblas
   - libcblas=3.9.0=16_osxarm64_openblas
   - libcurl=7.88.1=h9049daf_0
-  - libcxx=14.0.6=h2692d47_0
+  - libcxx=15.0.7=h75e25f2_0
   - libdeflate=1.17=h1a8c8d9_0
   - libedit=3.1.20191231=hc8eb9b7_2
   - libev=4.33=h642e427_1
@@ -102,7 +102,7 @@ dependencies:
   - libgfortran=5.0.0=11_3_0_hd922786_28
   - libgfortran5=11.3.0=hdaf2cc0_28
   - libglib=2.74.1=h4646484_1
-  - libgrpc=1.52.1=h1208df7_0
+  - libgrpc=1.52.1=he98ff75_1
   - libiconv=1.17=he4db4b2_0
   - libidn2=2.3.4=h1a8c8d9_0
   - liblapack=3.9.0=16_osxarm64_openblas
@@ -155,24 +155,23 @@ dependencies:
   - python=3.9.16=hea58f1e_0_cpython
   - python_abi=3.9=3_cp39
   - pytorch=1.13.1=py3.9_0
-  - re2=2023.02.01=hb7217d7_0
+  - re2=2023.02.02=hb7217d7_0
   - readline=8.1.2=h46ed386_0
   - requests=2.25.1=pyhd3eb1b0_0
   - requests-oauthlib=1.3.0=py_0
   - rsa=4.7.2=pyhd3eb1b0_1
   - scikit-learn=1.2.1=py39h57c6424_0
-  - scipy=1.10.0=py39h18313fe_2
-  - setuptools=67.3.2=pyhd8ed1ab_0
+  - scipy=1.10.1=py39h18313fe_0
+  - setuptools=67.4.0=pyhd8ed1ab_0
   - six=1.16.0=pyhd3eb1b0_1
   - svt-av1=1.4.1=h7ea286d_0
   - tensorboard=2.8.0=pyhd8ed1ab_1
-  - tensorboard-data-server=0.6.1=py39ha6e5c4f_0
+  - tensorboard-data-server=0.6.1=py39he2a39a8_4
   - tensorboard-plugin-wit=1.6.0=py_0
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.12=he1e0b03_0
   - tomli=2.0.1=pyhd8ed1ab_0
   - torchaudio=0.13.1=py39_cpu
-  - torchmetrics=0.11.1=pyhd8ed1ab_0
   - torchvision=0.14.1=py39_cpu
   - tqdm=4.62.3=pyhd3eb1b0_1
   - typing-extensions=4.1.1=hd3eb1b0_0

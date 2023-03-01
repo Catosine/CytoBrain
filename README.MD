@@ -3,6 +3,9 @@
 This is a repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
 Developed by [@Cytosine](https://github.com/Catosine)
 
+## Dataset
+You may access the dataset from [here](https://naturalscenesdataset.org)
+
 ## Quick Start
 ```Bash
     # To start a training
