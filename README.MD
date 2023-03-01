@@ -1,6 +1,6 @@
 # CytoBrain
 
-This is a **personal** repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
+This is a repository for [Algonauts2023 competition](http://algonauts.csail.mit.edu).  
 Developed by [@Cytosine](https://github.com/Catosine)
 
 ## Quick Start
