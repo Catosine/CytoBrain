@@ -45,6 +45,7 @@ dependencies:
   - appdirs=1.4.4=pyh9f0ad1d_0
   - async-timeout=4.0.1=pyhd3eb1b0_0
   - attrs=21.4.0=pyhd3eb1b0_0
+  - autopep8=2.0.1=pyhd8ed1ab_0
   - blinker=1.5=pyhd8ed1ab_0
   - brotlipy=0.7.0=py39h02fc5c5_1005
   - bzip2=1.0.8=h3422bc3_4
@@ -145,6 +146,7 @@ dependencies:
   - py-opencv=4.7.0=py39h85045c0_1
   - pyasn1=0.4.8=py_0
   - pyasn1-modules=0.2.8=py_0
+  - pycodestyle=2.10.0=pyhd8ed1ab_0
   - pycparser=2.21=pyhd3eb1b0_0
   - pyjwt=2.3.0=pyhd8ed1ab_1
   - pyopenssl=22.0.0=pyhd3eb1b0_0
@@ -168,6 +170,7 @@ dependencies:
   - tensorboard-plugin-wit=1.6.0=py_0
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.12=he1e0b03_0
+  - tomli=2.0.1=pyhd8ed1ab_0
   - torchaudio=0.13.1=py39_cpu
   - torchmetrics=0.11.1=pyhd8ed1ab_0
   - torchvision=0.14.1=py39_cpu
