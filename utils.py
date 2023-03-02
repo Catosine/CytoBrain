@@ -63,6 +63,8 @@ def __train_argParse(parser):
 
     parser.add_argument("--report_step", type=int, default=10,
                         help="Num of report steps for logging")
+    
+    #parser.add_argument("--early_stopping", type=int, default=5, help="Early stopping")
 
     parser.add_argument("--save_path", type=str, default="./logs",
                         help="Path to save training logs and models")
@@ -75,6 +77,15 @@ def __infer_argParse(parser):
     parser.add_argument("--save_path", type=str, default="./prediction",
                         help="Path to save training logs and models")
     parser.add_argument("--output_size", type=int, default=2048, help="Output size of pretrained model")
+
+    return parser
+
+
+def __feat_extract_argPargs(parser):
+
+    parser.add_argument("--save_path", type=str, default="./features",
+                        help="Path to save training logs and models")
+    parser.add_argument("--layers", type=str, nargs="+", help="The layer which features are extracted from")
 
     return parser
 
@@ -95,6 +106,16 @@ def infer_argParse():
 
     parser = __base_argParse(parser)
     parser = __infer_argParse(parser)
+
+    return parser.parse_args()
+
+
+def extract_argParse():
+
+    parser = argparse.ArgumentParser()
+
+    parser = __base_argParse(parser)
+    parser = __feat_extract_argPargs(parser)
 
     return parser.parse_args()
 
@@ -166,6 +187,13 @@ def inference_initialize(args):
 
     if not osp.isdir(args.save_path):
         os.mkdir(args.save_path)
+
+    return args
+
+
+def extract_initialize(args):
+
+    __common_initialize(args)
 
     return args
 
@@ -271,6 +299,18 @@ def compute_pearson(pred, target):
     pearson = pearson[mask]
 
     return pearson
+
+
+def build_train_script(args):
+
+    command = "python3 task_train.py"
+
+    for k, v in vars(args).items():
+
+        if v:
+            command += " \ \n\t--{key} {value}".format(key=k, value=v)
+
+    return command
 
 
 if __name__ == "__main__":

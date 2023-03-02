@@ -175,8 +175,12 @@ class NNTrainer:
 
         results = list()
 
+        device = next(model.parameters()).device
+
         for img, _ in tqdm(dataloader):
             model.eval()
+
+            img = img.to(device)
 
             with torch.no_grad():
                 pred = model(img)

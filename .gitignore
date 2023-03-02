@@ -141,9 +141,9 @@ dmypy.json
 
 # ignore training logs
 logs
-prediction
-pretrained_models
 backbone
+features
 
 # ignore all pretrained models
-**/**/*.pt(h)
+**/**/*.pt[h]
+**/**/*.npy

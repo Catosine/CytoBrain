@@ -20,7 +20,7 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 - [x] Inference Script
 
 ### 1. End2End Model 
-- ResNet50 + 3 of FCN
+- Pretrained ResNet50 + 1 FCN
 
 ### 2. CNN Extractor & Regression
 - Use ResNet50 as Extractor
@@ -30,4 +30,4 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 ## Results
 | Subject | Model | Epoch | Batch | Train Loss | Train Median Pearson Coef. | Dev Loss | Dev Median Pearson Coef. | Test Median Pearson Coef. | Note |
 | - | - | - | - | - | - | - | - | - | - |
-| Subj01  | End2end ResNet50 | NA | NA | NA | NA | NA | NA | NA | NA |
+| Subj01  | Pretrained ResNet50 + 1 FCN | NA | NA | NA | NA | NA | NA | NA | NA |
