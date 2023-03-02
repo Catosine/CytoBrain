@@ -60,13 +60,13 @@ class NNTrainer:
         best_score = -1
         self.logging.info("Start training")
 
-        for e in tqdm(range(epoch)):
+        for e in range(epoch):
 
             self.logging.info(
                 "==============<Epoch#{}>==============".format(e))
 
             # training
-            for img, fmri in train_loader:
+            for img, fmri in tqdm(train_loader):
 
                 _, score, loss = self.__batch_train(img, fmri)
 
@@ -85,7 +85,7 @@ class NNTrainer:
             # validating
             dev_score = list()
             dev_loss = list()
-            for img, fmri in val_loader:
+            for img, fmri in tqdm(val_loader):
 
                 _, score, loss = self.__batch_val(img, fmri)
                 dev_score.append(score)
