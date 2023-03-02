@@ -109,7 +109,7 @@ class NNTrainer:
                 "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(e, dev_loss, dev_score.mean(), dev_score.median()))
 
             if dev_score.median() > best_score:
-                best_score = dev_score
+                best_score = dev_score.median()
                 self.logging.info("New best model found @ Epoch#{}.".format(e))
                 torch.save(self.model.state_dict(), osp.join(
                     self.save_path, "checkpoint_best.pt"))

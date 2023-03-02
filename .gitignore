@@ -143,6 +143,7 @@ dmypy.json
 logs
 prediction
 pretrained_models
+backbone
 
 # ignore all pretrained models
-**/**/*.pt
+**/**/*.pt(h)

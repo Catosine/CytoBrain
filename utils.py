@@ -219,9 +219,9 @@ def build_model(model, output_size, pretrained=None):
         )
     else:
         raise NotImplemented
-    
+
     if pretrained:
-        model.load_state_dict(torch.load(pretrained))
+        model.load_state_dict(torch.load(pretrained), strict=False)
 
     return model
 
