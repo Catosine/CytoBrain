@@ -42,6 +42,7 @@ def main(args):
     # setup model
     model = build_model(args.model, fmri_size)
     model.to(args.device)
+
     logging.info(
         "Model initialized. Loaded to <{}> device.".format(args.device))
 

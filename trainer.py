@@ -114,7 +114,12 @@ class NNTrainer:
 
         self.model.train()
 
-        pred = self.model(img)
+        # load data to device
+        device = next(self.model.parameters()).device
+        img = img.to(device)
+        fmri = fmri.to(device)
+
+        pred = self.model(img.to(device))
         loss = self.criterion(pred, fmri)
         score = self.scoring_fn(pred, fmri)
 
@@ -130,6 +135,11 @@ class NNTrainer:
     def __batch_val(self, img, fmri):
 
         self.model.eval()
+
+        # load data to device
+        device = next(self.model.parameters()).device
+        img = img.to(device)
+        fmri = fmri.to(device)
 
         with torch.no_grad():
             pred = self.model(img)
