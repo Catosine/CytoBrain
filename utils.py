@@ -59,7 +59,7 @@ def __train_argParse(parser):
     parser.add_argument("--lr_regressor", type=float,
                         help="Learing rate for regressor")
 
-    parser.add_argument("--report_step", type=int, default=100,
+    parser.add_argument("--report_step", type=int, default=10,
                         help="Num of report steps for logging")
 
     parser.add_argument("--save_path", type=str, default="./logs",
