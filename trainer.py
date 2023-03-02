@@ -75,7 +75,7 @@ class NNTrainer:
 
                 train_step += 1
 
-                if train_step % 100 == 0:
+                if train_step % report_step == 0:
                     self.logging.info(
                         "[Training @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}".format(train_step, loss, score))
 
