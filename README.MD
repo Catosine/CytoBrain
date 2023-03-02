@@ -14,9 +14,9 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## ToDos
 ### 0. Preparation
-- [x] Dataset
-- [x] Training Script
-- [ ] Feature Extraction Script
+- [x] [Dataset](./dataset.py)
+- [x] [Training Script](./task_train.py)
+- [x] [Feature Extraction Script](./feature_extract.py)
 - [x] Inference Script
 
 ### 1. End2End Model 
