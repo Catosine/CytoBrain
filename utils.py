@@ -210,16 +210,12 @@ def build_model(model, output_size, pretrained=None):
     if model == "resnet18":
         model = torchvision.models.resnet18()
         model.fc = nn.Sequential(
-            nn.Linear(in_features=512, out_features=4096, bias=True),
-            nn.Linear(in_features=4096, out_features=8192, bias=True),
-            nn.Linear(in_features=8192, out_features=output_size, bias=True)
+            nn.Linear(in_features=512, out_features=output_size, bias=True)
         )
     elif model == "resnet50":
         model = torchvision.models.resnet50()
         model.fc = nn.Sequential(
-            nn.Linear(in_features=2048, out_features=4096, bias=True),
-            nn.Linear(in_features=4096, out_features=8192, bias=True),
-            nn.Linear(in_features=8192, out_features=output_size, bias=True)
+            nn.Linear(in_features=2048, out_features=output_size, bias=True)
         )
     else:
         raise NotImplemented
