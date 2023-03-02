@@ -40,7 +40,7 @@ def main(args):
     logging.info("Hemisphere FMRI size: {}".format(fmri_size))
 
     # setup model
-    model = build_model(args.model, fmri_size)
+    model = build_model(args.model, fmri_size, args.pretrained_weight)
     model.to(args.device)
 
     logging.info(
