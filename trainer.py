@@ -70,14 +70,15 @@ class NNTrainer:
 
                 _, score, loss = self.__batch_train(img, fmri)
 
-                self.summarywriter.add_scalar("train/loss", loss, train_step)
-                self.summarywriter.add_scalar("train/score", score, train_step)
+                self.summarywriter.add_scalar("train/batch/loss", loss, train_step)
+                self.summarywriter.add_scalar("train/batch/avg. score", score.mean(), train_step)
+                self.summarywriter.add_scalar("train/batch/median score", score.median(), train_step)
 
                 train_step += 1
 
                 if train_step % report_step == 0:
                     self.logging.info(
-                        "[Training @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}".format(train_step, loss, score))
+                        "[Training @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f} Median Score: {:.3f}".format(train_step, loss, score.mean(), score.median()))
 
             torch.save(self.model.state_dict(), osp.join(
                 self.save_path, "checkpoint_epoch_{}.pt".format(e)))
@@ -88,21 +89,23 @@ class NNTrainer:
             for img, fmri in tqdm(val_loader):
 
                 _, score, loss = self.__batch_val(img, fmri)
+
                 dev_score.append(score)
                 dev_loss.append(loss)
 
-                self.summarywriter.add_scalar("dev/loss", loss, dev_step)
-                self.summarywriter.add_scalar("dev/score", score, dev_step)
+                self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
+                self.summarywriter.add_scalar("dev/batch/avg. score", score.mean(), dev_step)
+                self.summarywriter.add_scalar("dev/batch/median score", score.median(), dev_step)
 
                 dev_step += 1
 
-            dev_score = np.array(dev_score).mean()
-            dev_loss = np.array(dev_loss).mean()
+            dev_score = torch.concat(dev_score)
+            dev_loss = torch.stack(dev_loss).mean()
 
             self.logging.info(
-                "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}".format(e, dev_loss, dev_score))
+                "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f} Median Score: {:.3f}".format(e, dev_loss, dev_score.mean(), dev_score.median()))
 
-            if dev_score > best_score:
+            if dev_score.median() > best_score:
                 best_score = dev_score
                 self.logging.info("New best model found @ Epoch#{}.".format(e))
                 torch.save(self.model.state_dict(), osp.join(
@@ -130,7 +133,7 @@ class NNTrainer:
 
         self.model.zero_grad()
 
-        return pred.detach(), score.mean().detach(), loss.detach()
+        return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
 
     def __batch_val(self, img, fmri):
 
@@ -146,7 +149,7 @@ class NNTrainer:
             loss = self.criterion(pred, fmri)
             score = self.scoring_fn(pred, fmri)
 
-        return pred.detach(), score.mean().detach(), loss.detach()
+        return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
 
     @staticmethod
     def infer(model, dataset, batch_size=64, num_workers=4):
