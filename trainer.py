@@ -99,6 +99,9 @@ class NNTrainer:
 
                 dev_step += 1
 
+            self.summarywriter.add_scalar("dev/epoch/avg. score", score.mean(), e)
+            self.summarywriter.add_scalar("dev/epoch/median score", score.median(), e)
+            
             dev_score = torch.concat(dev_score)
             dev_loss = torch.stack(dev_loss).mean()
 
