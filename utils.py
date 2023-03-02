@@ -40,7 +40,7 @@ def __base_argParse(parser):
     parser.add_argument("--model", type=str, default="resnet50",
                         choices=["resnet18", "resnet50"], help="Select different models")
     parser.add_argument("--batch_size", type=int,
-                        default=64, help="Batch size")
+                        default=16, help="Batch size")
     parser.add_argument("--seed", type=int, default=1001, help="Random seed")
 
     parser.add_argument("--note", type=str, help="Note.")
@@ -55,7 +55,7 @@ def __train_argParse(parser):
     parser.add_argument("--epoch", type=int, default=100,
                         help="Epoch number to train the model")
 
-    parser.add_argument("--lr", type=float, default=0.05, help="Learning rate")
+    parser.add_argument("--lr", type=float, default=5e-3, help="Learning rate")
     parser.add_argument("--lr_regressor", type=float,
                         help="Learing rate for regressor")
 
@@ -243,8 +243,8 @@ def build_transform(subj, train=True):
 
     if train:
         tf += [
-            transforms.Pad(64),
-            transforms.RandomCrop(size=(425)),
+            #transforms.Pad(64),
+            transforms.RandomCrop(size=(256)),
             transforms.RandomHorizontalFlip(),
         ]
 
