@@ -17,8 +17,8 @@ from torch.utils.data import DataLoader
 from torchvision.models.feature_extraction import create_feature_extractor
 from tqdm import tqdm
 
-from dataset import Algonauts2023Raw
-from utils import extract_argParse, extract_initialize, build_model, build_transform
+from src.dataset import Algonauts2023Raw
+from src.utils import extract_argParse, extract_initialize, build_model, build_transform
 
 def main(args):
     # initialize
@@ -27,7 +27,7 @@ def main(args):
     print(args)
 
     # load dataset
-    dataset = Algonauts2023Raw(osp.join(args.data, args.subject), train=False, transform=build_transform(args.subject, False))
+    dataset = Algonauts2023Raw(osp.join(args.data, args.subject), train=True, hemisphere=args.hemisphere, transform=build_transform(args.subject, False))
     print("#Total: {}".format(len(dataset)))
 
     # setup model
@@ -59,7 +59,8 @@ def main(args):
             for k in pred.keys():
                 output[k].append(pred[k].detach().cpu())
 
-    filename_template = "{subj}_{pretrained}".format(subj=args.subject, pretrained=args.pretrained_weight.split("/")[-1].split(".")[0])
+    filename_template = "{subj}_{hemisphere}_{pretrained}".format(
+        subj=args.subject, hemisphere=args.hemisphere,  pretrained=args.pretrained_weight.split("/")[-1].split(".")[0])
     args.save_path = osp.join(args.save_path, filename_template)
 
     print("Saving features")

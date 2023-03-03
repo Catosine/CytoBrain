@@ -11,7 +11,6 @@
 # 　＼二つ ；
 import os.path as osp
 
-import numpy as np
 import torch
 import torch.utils.data as data
 from tqdm import tqdm

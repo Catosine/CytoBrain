@@ -81,8 +81,6 @@ class Algonauts2023Raw(Dataset):
         
         if self.transform:
             img = self.transform(img)
-        
-        #img = img.reshape(img.shape[2], img.shape[0], img.shape[1])
 
         return img, self.fmri[img_idx] if self.train else 0
 

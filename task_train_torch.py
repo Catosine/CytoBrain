@@ -15,9 +15,9 @@ import os.path as osp
 import torch.nn as nn
 import torch.optim as optim
 
-from dataset import Algonauts2023Raw
-from utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
-from trainer import NNTrainer
+from src.dataset import Algonauts2023Raw
+from src.utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
+from src.trainer import NNTrainer
 
 
 def main(args):

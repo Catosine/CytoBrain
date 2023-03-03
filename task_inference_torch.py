@@ -13,9 +13,9 @@ import os.path as osp
 
 import numpy as np
 
-from dataset import Algonauts2023Raw
-from utils import infer_argParse, inference_initialize, build_model, build_transform
-from trainer import NNTrainer
+from src.dataset import Algonauts2023Raw
+from src.utils import infer_argParse, inference_initialize, build_model, build_transform
+from src.trainer import NNTrainer
 
 def main(args):
     # initialize

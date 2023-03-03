@@ -25,7 +25,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from constant import TRAIN_MEAN, TRAIN_STD, TEST_MEAN, TEST_STD
+from .constant import TRAIN_MEAN, TRAIN_STD, TEST_MEAN, TEST_STD
 
 def __base_argParse(parser):
 
