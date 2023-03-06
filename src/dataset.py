@@ -153,6 +153,39 @@ class Algonauts2023Feature(Dataset):
                          ).astype(np.float32)
 
         return feature, self.fmri[feat_idx] if self.train else 0
+    
+
+def get_dataset(data_path: str, extractor: str, layer: str,  hemisphere: str = "L", train: bool = True):
+
+    path_struct = osp.join(data_path, "{}_split")
+
+    if train:
+        shared_path = osp.join(
+            path_struct.format("training"), "training_{}")
+        if hemisphere == "L":
+            fmri = np.load(osp.join(shared_path.format(
+                "fmri"), "lh_training_fmri.npy"))
+        elif hemisphere == "R":
+            fmri = np.load(osp.join(shared_path.format(
+                "fmri"), "rh_training_fmri.npy"))
+
+        feature_path = shared_path.format("features")
+
+    else:
+        feature_path = osp.join(
+            path_struct.format("test"), "test_features")
+
+    feature_path = osp.join(feature_path, extractor, layer)
+
+    features = list()
+    fmris = list()
+    for f in os.listdir(feature_path):
+
+        features.append(np.load(osp.join(feature_path, f)).astype(np.float32))
+        feat_idx = int(re.findall("\d{4}", f)[0]) - 1
+        fmris.append(fmri[feat_idx] if train else np.ones(1))
+    
+    return np.stack(features), np.stack(fmris)
 
 
 if __name__ == "__main__":

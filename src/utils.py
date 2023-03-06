@@ -297,7 +297,7 @@ def compute_pearson(pred, target):
             target,         torch.Tensor, target
     """
 
-    pearson = torch.corrcoef(torch.concat([pred, target]))
+    pearson = torch.corrcoef(torch.concat([pred.T, target.T]))
     size = pred.size(0)
     mask = [[False for _ in range(size*2)] for _ in range(size*2)]
 
