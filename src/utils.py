@@ -143,8 +143,9 @@ def __common_initialize(args):
 
     # setup logs dir
     if not osp.isdir(args.save_path):
-        os.mkdir(args.save_path)
+        os.makedirs(args.save_path)
 
+    #args.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     return args
@@ -179,14 +180,14 @@ def inference_initialize(args):
 
     __common_initialize(args)
 
-    args.save_path = osp.join(args.save_path, "{subj}_{hemisphere}_{model}".format(
+    args.save_path = osp.join(args.save_path, "{subj}_{model}".format(
         subj=args.subject, hemisphere=args.hemisphere, 
         model=args.pretrained_weight.split("/")[-1].split(".")[0]))
     if args.note:
         args.save_path += "_{}".format(args.note)
 
     if not osp.isdir(args.save_path):
-        os.mkdir(args.save_path)
+        os.makedirs(args.save_path)
 
     return args
 
@@ -194,6 +195,13 @@ def inference_initialize(args):
 def extract_initialize(args):
 
     __common_initialize(args)
+
+    args.save_path = osp.join(args.save_path, args.pretrained_weight.split("/")[-1].split(".")[0])
+    if args.note:
+        args.save_path += "_{}".format(args.note)
+
+    if not osp.isdir(args.save_path):
+        os.makedirs(args.save_path)
 
     return args
 
