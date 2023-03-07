@@ -83,13 +83,14 @@ class NNTrainer:
                 self.save_path, "checkpoint_epoch_{}.pt".format(e)))
 
             # validating
-            dev_score = list()
             dev_loss = list()
+            dev_pred = list()
+            dev_fmri = list()
             for img, fmri in tqdm(val_loader):
 
-                _, score, loss = self.__batch_val(img, fmri)
-
-                dev_score.append(score)
+                pred, score, loss = self.__batch_val(img, fmri)
+                dev_pred.append(pred)
+                dev_fmri.append(fmri)
                 dev_loss.append(loss)
 
                 self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
@@ -98,8 +99,11 @@ class NNTrainer:
 
                 dev_step += 1
 
-            self.summarywriter.add_scalar("dev/epoch/avg. score", score.mean(), e)
-            self.summarywriter.add_scalar("dev/epoch/median score", score.median(), e)
+            epoch_score = self.scoring_fn(torch.concat(dev_pred), torch.concat(dev_fmri))
+
+            self.summarywriter.add_scalar("dev/epoch/avg. score", epoch_score.mean(), e)
+            self.summarywriter.add_scalar(
+                "dev/epoch/median score", epoch_score.median(), e)
 
             dev_score = torch.concat(dev_score)
             dev_loss = torch.stack(dev_loss).mean()
