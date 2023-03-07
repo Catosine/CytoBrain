@@ -9,115 +9,15 @@
 # 　／￣|　　 |　|　|
 # 　| (￣ヽ＿_ヽ_)__)
 # 　＼二つ ；
-import argparse
-import logging
-import os
-import os.path as osp
-import sys
-import time
-
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.dataset import Subset
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from constant import TRAIN_MEAN, TRAIN_STD, TEST_MEAN, TEST_STD
-
-def __base_argParse(parser):
-
-    parser.add_argument("--data", type=str, default="/Users/cytosine/Documents/Algonauts2023/data",
-                        help="Path to Algonauts2023 dataset")
-    parser.add_argument("--subject", type=str, default="subj01",
-                        choices=["subj01", "subj02", "subj03", "subj04",
-                                 "subj05", "subj06", "subj07", "subj08"],
-                        help="Used to select which subject to learn")
-    parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
-                        help="Select which half of the brain to model")
-    parser.add_argument("--model", type=str, default="resnet50",
-                        choices=["resnet18", "resnet50"], help="Select different models")
-    parser.add_argument("--pretrained_weight", type=str,
-                        help="Path to pretrained weight")
-    parser.add_argument("--batch_size", type=int,
-                        default=16, help="Batch size")
-    parser.add_argument("--seed", type=int, default=1001, help="Random seed")
-
-    parser.add_argument("--note", type=str, help="Note.")
-
-    return parser
-
-
-def __train_argParse(parser):
-
-    parser.add_argument("--train_ratio", type=float, default=0.8,
-                        help="Train/Dev set ratio")
-    parser.add_argument("--epoch", type=int, default=100,
-                        help="Epoch number to train the model")
-
-    parser.add_argument("--lr", type=float, default=5e-3, help="Learning rate")
-    parser.add_argument("--lr_regressor", type=float,
-                        help="Learing rate for regressor")
-
-    parser.add_argument("--report_step", type=int, default=10,
-                        help="Num of report steps for logging")
-    
-    #parser.add_argument("--early_stopping", type=int, default=5, help="Early stopping")
-
-    parser.add_argument("--save_path", type=str, default="./logs",
-                        help="Path to save training logs and models")
-
-    return parser
-
-
-def __infer_argParse(parser):
-
-    parser.add_argument("--save_path", type=str, default="./prediction",
-                        help="Path to save training logs and models")
-    parser.add_argument("--output_size", type=int, default=2048, help="Output size of pretrained model")
-
-    return parser
-
-
-def __feat_extract_argPargs(parser):
-
-    parser.add_argument("--save_path", type=str, default="./features",
-                        help="Path to save training logs and models")
-    parser.add_argument("--layers", type=str, nargs="+", help="The layer which features are extracted from")
-
-    return parser
-
-
-def train_argParse():
-
-    parser = argparse.ArgumentParser()
-
-    parser = __base_argParse(parser)
-    parser = __train_argParse(parser)
-
-    return parser.parse_args()
-
-
-def infer_argParse():
-
-    parser = argparse.ArgumentParser()
-
-    parser = __base_argParse(parser)
-    parser = __infer_argParse(parser)
-
-    return parser.parse_args()
-
-
-def extract_argParse():
-
-    parser = argparse.ArgumentParser()
-
-    parser = __base_argParse(parser)
-    parser = __feat_extract_argPargs(parser)
-
-    return parser.parse_args()
+from .constant import TRAIN_MEAN, TRAIN_STD, TEST_MEAN, TEST_STD
 
 
 def train_dev_split(dset, train_ratio=0.8):
@@ -130,80 +30,6 @@ def train_dev_split(dset, train_ratio=0.8):
     dev_idx = np.argwhere(dev_idx).reshape(-1)
 
     return Subset(dset, train_idx), Subset(dset, dev_idx)
-
-
-def __common_initialize(args):
-
-    # set random seed
-    torch.manual_seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-
-    # setup logs dir
-    if not osp.isdir(args.save_path):
-        os.makedirs(args.save_path)
-
-    #args.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
-    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    return args
-
-
-def train_initialize(args):
-
-    __common_initialize(args)
-
-    timestamp = time.strftime("%Y%m%d%H%M%S")
-    args.save_path = osp.join(args.save_path, "{timestamp}_{subj}_{hemisphere}_{model}_rs{rs}".format(
-        timestamp=timestamp, subj=args.subject, hemisphere=args.hemisphere, model=args.model, rs=args.seed))
-    if args.note:
-        args.save_path += "_{}".format(args.note)
-
-    # init tensorboard & logging
-    args.summarywriter = SummaryWriter(args.save_path)
-    log_path = osp.join(args.save_path, "training_logs.txt")
-
-    time_format = '%(asctime)s %(message)s'
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-                        format=time_format, datefmt='%m/%d %I:%M:%S %p')
-
-    fh = logging.FileHandler(log_path)
-    fh.setFormatter(logging.Formatter(time_format))
-    logging.getLogger().addHandler(fh)
-
-    return args
-
-
-def inference_initialize(args):
-
-    __common_initialize(args)
-
-    args.save_path = osp.join(args.save_path, "{subj}_{model}".format(
-        subj=args.subject, hemisphere=args.hemisphere, 
-        model=args.pretrained_weight.split("/")[-1].split(".")[0]))
-    if args.note:
-        args.save_path += "_{}".format(args.note)
-
-    if not osp.isdir(args.save_path):
-        os.makedirs(args.save_path)
-
-    return args
-
-
-def extract_initialize(args):
-
-    __common_initialize(args)
-
-    args.save_path = osp.join(args.save_path, args.pretrained_weight.split("/")[-1].split(".")[0])
-    if args.note:
-        args.save_path += "_{}".format(args.note)
-
-    if not osp.isdir(args.save_path):
-        os.makedirs(args.save_path)
-
-    return args
 
 
 def build_optimizer(model, lr, lr_regressor):

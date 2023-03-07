@@ -15,9 +15,9 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 ## ToDos
 ### 0. Preparation
 - [x] [Dataset](./src/dataset.py)
-- [x] [Training Script](./task_train.py)
+- [x] [Training Script](./task_train_torch.py)
 - [x] [Feature Extraction Script](./feature_extract.py)
-- [x] Inference Script
+- [x] [Inference Script](./task_inference_torch.py)
 
 ### 1. End2End Model 
 - Pretrained ResNet50 + 1 FCN
@@ -30,4 +30,8 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 ## Results
 | Subject | Model | Epoch | Batch | Train Loss | Train Median Pearson Coef. | Dev Loss | Dev Median Pearson Coef. | Test Median Pearson Coef. | Note |
 | - | - | - | - | - | - | - | - | - | - |
-| Subj01  | Pretrained ResNet50 + 1 FCN | NA | NA | NA | NA | NA | NA | NA | NA |
+| Subj01  | ResNet50 Feature + Linear Regressor | NA | NA | NA | NA | NA | NA | NA | NA |
+
+## Figures
+![example](./img/histogram_pearson.png)
+![example](./img/box_pearson.png)

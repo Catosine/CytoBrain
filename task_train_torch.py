@@ -16,7 +16,9 @@ import torch.nn as nn
 import torch.optim as optim
 
 from src.dataset import Algonauts2023Raw
-from src.utils import train_argParse, train_initialize, train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
+from src.utils import train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
+from src.arg_parse import train_argParse
+from src.initialize import train_initialize
 from src.trainer import NNTrainer
 
 
