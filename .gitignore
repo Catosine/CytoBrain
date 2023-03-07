@@ -126,8 +126,8 @@ dmypy.json
 *.json
 
 # screen shots
-*.png
-*.html
+# *.png
+# *.html
 
 # playground
 *playground*
