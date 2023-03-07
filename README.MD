@@ -33,5 +33,5 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 | Subj01  | ResNet50 Feature + Linear Regressor | NA | NA | NA | NA | NA | NA | NA | NA |
 
 ## Figures
-![example](./img/histogram_pearson.png)
-![example](./img/box_pearson.png)
+![example](./img/histogram_pearson_20230307175106.png)
+![example](./img/box_pearson_20230307175106.png)
