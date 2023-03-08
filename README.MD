@@ -29,10 +29,13 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## Experiment Results
 ### Preatrained Feature Modelling
-| Subject | Feature  | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
-| ------  | -------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
-| Subj01  | resnet50 | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline |
-| Subj01  | resnet50 | LassoR  |                               |                                | | baseline |
+| Subject | Feature          | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
+| ------  | ---------------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
+| Subj01  | resnet50-avgpool | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline |
+| Subj01  | resnet50-avgpool | RidgeR  | 0.250                         | 0.249                          | [fig](./img/ridge_baseline/histogram_pearson_20230308144134.png) | baseline |
+| Subj01  | resnet50-avgpool | RidgeR  | 0.250                         | 0.249                          | [fig](./img/ridge_baseline/histogram_pearson_20230308144134.png) | alpha=1e5 |
 
 ### Figures
-![example](./img/linear_regression_baseline/histogram_pearson_20230308144134.png)
+![](./img/linear_regression_baseline/histogram_pearson_20230308144134.png)
+![](./img/ridge_baseline/histogram_pearson_20230308160405.png)
+![](./img/ridge_alpha_1e5/histogram_pearson_20230308162134.png)
