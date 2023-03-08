@@ -69,9 +69,12 @@ class NNTrainer:
 
                 _, score, loss = self.__batch_train(img, fmri)
 
-                self.summarywriter.add_scalar("train/batch/loss", loss, train_step)
-                self.summarywriter.add_scalar("train/batch/avg. score", score.mean(), train_step)
-                self.summarywriter.add_scalar("train/batch/median score", score.median(), train_step)
+                self.summarywriter.add_scalar(
+                    "train/batch/loss", loss, train_step)
+                self.summarywriter.add_scalar(
+                    "train/batch/avg. score", score.mean(), train_step)
+                self.summarywriter.add_scalar(
+                    "train/batch/median score", score.median(), train_step)
 
                 train_step += 1
 
@@ -94,14 +97,18 @@ class NNTrainer:
                 dev_loss.append(loss)
 
                 self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
-                self.summarywriter.add_scalar("dev/batch/avg. score", score.mean(), dev_step)
-                self.summarywriter.add_scalar("dev/batch/median score", score.median(), dev_step)
+                self.summarywriter.add_scalar(
+                    "dev/batch/avg. score", score.mean(), dev_step)
+                self.summarywriter.add_scalar(
+                    "dev/batch/median score", score.median(), dev_step)
 
                 dev_step += 1
 
-            epoch_score = self.scoring_fn(torch.concat(dev_pred), torch.concat(dev_fmri))
+            epoch_score = self.scoring_fn(
+                torch.concat(dev_pred), torch.concat(dev_fmri))
 
-            self.summarywriter.add_scalar("dev/epoch/avg. score", epoch_score.mean(), e)
+            self.summarywriter.add_scalar(
+                "dev/epoch/avg. score", epoch_score.mean(), e)
             self.summarywriter.add_scalar(
                 "dev/epoch/median score", epoch_score.median(), e)
 

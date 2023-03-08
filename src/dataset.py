@@ -53,10 +53,11 @@ class Algonauts2023Raw(Dataset):
                     "fmri"), "rh_training_fmri.npy"))
 
             self.feature_path = shared_path.format("images")
-        
+
         else:
-            self.feature_path = osp.join(path_struct.format("test"), "test_images")
-            
+            self.feature_path = osp.join(
+                path_struct.format("test"), "test_images")
+
         self.dataset = list(os.listdir(self.feature_path))
 
     def __len__(self):
@@ -77,8 +78,9 @@ class Algonauts2023Raw(Dataset):
         feat_file = self.dataset[index]
         feat_idx = int(re.findall("\d{4}", feat_file)[0]) - 1
 
-        img = cv2.imread(osp.join(self.feature_path, feat_file)).astype(np.float32)
-        
+        img = cv2.imread(osp.join(self.feature_path, feat_file)
+                         ).astype(np.float32)
+
         if self.transform:
             img = self.transform(img)
 
@@ -125,11 +127,11 @@ class Algonauts2023Feature(Dataset):
         else:
             self.feature_path = osp.join(
                 path_struct.format("test"), "test_features")
-            
+
         self.feature_path = osp.join(self.feature_path, extractor, layer)
 
         self.dataset = list(os.listdir(self.feature_path))
-    
+
     def __len__(self):
         return len(self.dataset)
 
@@ -150,24 +152,22 @@ class Algonauts2023Feature(Dataset):
 
         # load
         feature = np.load(osp.join(self.feature_path, feat_file)
-                         ).astype(np.float32)
+                          ).astype(np.float32)
 
         return feature, self.fmri[feat_idx] if self.train else 0
-    
 
-def get_dataset(data_path: str, extractor: str, layer: str,  hemisphere: str = "L", train: bool = True):
+
+def get_dataset(data_path: str, extractor: str, layer: str, train: bool = True):
 
     path_struct = osp.join(data_path, "{}_split")
 
     if train:
         shared_path = osp.join(
             path_struct.format("training"), "training_{}")
-        if hemisphere == "L":
-            fmri = np.load(osp.join(shared_path.format(
-                "fmri"), "lh_training_fmri.npy"))
-        elif hemisphere == "R":
-            fmri = np.load(osp.join(shared_path.format(
-                "fmri"), "rh_training_fmri.npy"))
+        lfmri = np.load(osp.join(shared_path.format(
+            "fmri"), "lh_training_fmri.npy"))
+        rfmri = np.load(osp.join(shared_path.format(
+            "fmri"), "rh_training_fmri.npy"))
 
         feature_path = shared_path.format("features")
 
@@ -178,21 +178,23 @@ def get_dataset(data_path: str, extractor: str, layer: str,  hemisphere: str = "
     feature_path = osp.join(feature_path, extractor, layer)
 
     features = list()
-    fmris = list()
+    lfmris = list()
+    rfmris = list()
     for f in os.listdir(feature_path):
 
         features.append(np.load(osp.join(feature_path, f)).astype(np.float32))
         feat_idx = int(re.findall("\d{4}", f)[0]) - 1
-        fmris.append(fmri[feat_idx] if train else np.ones(1))
-    
-    return np.stack(features), np.stack(fmris)
+        lfmris.append(lfmri[feat_idx] if train else np.ones(1))
+        rfmris.append(rfmri[feat_idx] if train else np.ones(1))
+
+    return np.stack(features), np.stack(lfmris), np.stack(rfmris)
 
 
 if __name__ == "__main__":
 
-    dataset = Algonauts2023Feature("/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01", extractor="resnet50-imagenet1k-v2", layer="avgpool", train=True)
-    
+    dataset = Algonauts2023Feature("/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01",
+                                   extractor="resnet50-imagenet1k-v2", layer="avgpool", train=True)
+
     feat, fmri = dataset[0]
     print(feat.shape)
     print(fmri.shape)
-

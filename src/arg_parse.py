@@ -11,6 +11,7 @@
 # 　＼二つ ；
 import argparse
 
+
 def __base_argParse(parser):
 
     parser.add_argument("--data", type=str, default="/Users/cytosine/Documents/Algonauts2023/data",

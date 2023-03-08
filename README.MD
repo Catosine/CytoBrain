@@ -27,11 +27,12 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 - Rigid/Lasso Regression
 - Elastic Net (L1+L2)
 
-## Results
-| Subject | Model | Epoch | Batch | Train Loss | Train Median Pearson Coef. | Dev Loss | Dev Median Pearson Coef. | Test Median Pearson Coef. | Note |
-| - | - | - | - | - | - | - | - | - | - |
-| Subj01  | ResNet50 Feature + Linear Regressor | NA | NA | NA | NA | NA | NA | NA | NA |
+## Experiment Results
+### Preatrained Feature Modelling
+| Subject | Feature  | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
+| ------  | -------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
+| Subj01  | resnet50 | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline |
+| Subj01  | resnet50 | LassoR  |                               |                                | | baseline |
 
-## Figures
-![example](./img/histogram_pearson_20230307175106.png)
-![example](./img/box_pearson_20230307175106.png)
+### Figures
+![example](./img/linear_regression_baseline/histogram_pearson_20230308144134.png)

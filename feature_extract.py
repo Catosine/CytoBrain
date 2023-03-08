@@ -18,7 +18,9 @@ import torch
 from torchvision.models.feature_extraction import create_feature_extractor
 from tqdm import tqdm
 
-from src.utils import extract_argParse, extract_initialize, build_model, build_transform
+from src.utils import build_model, build_transform
+from src.initialize import extract_initialize
+from src.arg_parse import extract_argParse
 
 def main(args):
     # initialize

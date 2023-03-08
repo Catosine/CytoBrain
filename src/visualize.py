@@ -86,9 +86,10 @@ def histogram(roi_path, lh_correlation, rh_correlation, title, save=None):
     df = pd.DataFrame({"ROIs": roi_names + roi_names, "Median Pearson's R": lh_median_roi_correlation + rh_median_roi_correlation,
                        "Hemisphere": ["Left"] * len(lh_roi_correlation) + ["Right"] * len(rh_roi_correlation)})
     # draw the diagram
-    fig = px.histogram(df, x="ROIs", y="Median Pearson's R", color="Hemisphere", 
+    fig = px.histogram(df, x="ROIs", y="Median Pearson's R", color="Hemisphere",
                        hover_data=df.columns.tolist(), barmode="group", width=1500, height=500)
-    fig.update_xaxes(categoryorder='array', categoryarray=roi_names, tickangle=45)
+    fig.update_xaxes(categoryorder='array',
+                     categoryarray=roi_names, tickangle=45)
     fig.update_layout(title_text=title, yaxis=dict(range=[0.0, 1.0]))
 
     if save:
@@ -96,7 +97,8 @@ def histogram(roi_path, lh_correlation, rh_correlation, title, save=None):
         if not osp.isdir(save):
             os.makedirs(save)
 
-        to_save = osp.join(save, "histogram_pearson_{}".format(strftime("%Y%m%d%H%M%S")))
+        to_save = osp.join(save, "histogram_pearson_{}".format(
+            strftime("%Y%m%d%H%M%S")))
 
         fig.write_html(to_save+".html")
         fig.write_image(to_save+".png")
@@ -133,9 +135,10 @@ def box_plot(roi_path, lh_correlation, rh_correlation, title, save=None):
     df = pd.DataFrame({"ROIs": r, "Pearson's R": p, "Hemisphere": h})
 
     # draw the diagram
-    fig = px.box(df, x="ROIs", y="Pearson's R", color="Hemisphere", 
+    fig = px.box(df, x="ROIs", y="Pearson's R", color="Hemisphere",
                  hover_data=df.columns.tolist(), width=1500, height=500)
-    fig.update_xaxes(categoryorder='array', categoryarray=roi_names, tickangle=45)
+    fig.update_xaxes(categoryorder='array',
+                     categoryarray=roi_names, tickangle=45)
     fig.update_layout(title_text=title)
 
     if save:
@@ -143,9 +146,36 @@ def box_plot(roi_path, lh_correlation, rh_correlation, title, save=None):
         if not osp.isdir(save):
             os.makedirs(save)
 
-        to_save = osp.join(save, "box_pearson_{}".format(strftime("%Y%m%d%H%M%S")))
+        to_save = osp.join(save, "box_pearson_{}".format(
+            strftime("%Y%m%d%H%M%S")))
 
         fig.write_html(to_save+".html")
         fig.write_image(to_save+".png")
 
     return fig
+
+
+if __name__ == "__main__":
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", type=str,
+                        help="path to data set where keeps ROI masks")
+    parser.add_argument("--l_correlation", type=str,
+                        help="Correlation of left hemishpere")
+    parser.add_argument("--r_correlation", type=str,
+                        help="Correlation of right hemishpere")
+    parser.add_argument("--save_path", type=str, default=".")
+    parser.add_argument("--title", type=str,
+                        help="Title of the generated figs")
+
+    args = parser.parse_args()
+
+    l_correlation = np.load(args.l_correlation)
+    r_correlation = np.load(args.r_correlation)
+
+    histogram(args.data, l_correlation, r_correlation,
+              args.title, args.save_path)
+    box_plot(args.data, l_correlation, r_correlation,
+             args.title, args.save_path)
