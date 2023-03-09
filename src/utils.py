@@ -79,6 +79,11 @@ def build_model(model, output_size, pretrained=None):
         model.fc = nn.Sequential(
             nn.Linear(in_features=2048, out_features=output_size, bias=True)
         )
+    elif model == "resnet152":
+        model = torchvision.models.resnet152()
+        model.fc = nn.Sequential(
+            nn.Linear(in_features=2048, out_features=output_size, bias=True)
+        )
     else:
         raise NotImplemented
 

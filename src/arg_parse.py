@@ -23,7 +23,7 @@ def __base_argParse(parser):
     parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
                         help="Select which half of the brain to model")
     parser.add_argument("--model", type=str, default="resnet50",
-                        choices=["resnet18", "resnet50"], help="Select different models")
+                        choices=["resnet18", "resnet50", "resnet152"], help="Select different models")
     parser.add_argument("--pretrained_weight", type=str,
                         help="Path to pretrained weight")
     parser.add_argument("--batch_size", type=int,
