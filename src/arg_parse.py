@@ -14,7 +14,7 @@ import argparse
 
 def __base_argParse(parser):
 
-    parser.add_argument("--data", type=str, default="/Users/cytosine/Documents/Algonauts2023/data",
+    parser.add_argument("--data", type=str, default="/Users/cytosine/Documents/Algonauts2023/data.nosync",
                         help="Path to Algonauts2023 dataset")
     parser.add_argument("--subject", type=str, default="subj01",
                         choices=["subj01", "subj02", "subj03", "subj04",
@@ -73,6 +73,7 @@ def __feat_extract_argPargs(parser):
                         help="Path to save training logs and models")
     parser.add_argument("--layers", type=str, nargs="+",
                         help="The layer which features are extracted from")
+    parser.add_argument("--train", action="store_true", help="if extract data from train set")
 
     return parser
 
