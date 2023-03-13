@@ -49,8 +49,6 @@ def __train_argParse(parser):
     parser.add_argument("--report_step", type=int, default=10,
                         help="Num of report steps for logging")
 
-    # parser.add_argument("--early_stopping", type=int, default=5, help="Early stopping")
-
     parser.add_argument("--save_path", type=str, default="./logs",
                         help="Path to save training logs and models")
 

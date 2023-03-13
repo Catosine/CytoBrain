@@ -3,4 +3,5 @@ pytorch==1.13.1
 torchvision==0.14.1
 opencv==4.7.0
 plotly
+kaleido
 tqdm

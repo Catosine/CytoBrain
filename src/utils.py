@@ -84,6 +84,8 @@ def build_model(model, output_size, pretrained=None):
         model.fc = nn.Sequential(
             nn.Linear(in_features=2048, out_features=output_size, bias=True)
         )
+    elif model == "fasterrcnn":
+        model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2()
     else:
         raise NotImplemented
 

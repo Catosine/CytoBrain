@@ -245,4 +245,6 @@ dependencies:
   - zipp=3.6.0=pyhd3eb1b0_0
   - zlib=1.2.13=h03a7124_4
   - zstd=1.5.2=hf913c23_6
+  - pip:
+      - kaleido==0.2.1
 prefix: /opt/miniconda3/envs/algonauts

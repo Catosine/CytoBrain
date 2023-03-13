@@ -132,6 +132,12 @@ dmypy.json
 # playground
 *playground*
 
+# submission
+*submission*
+
+# anything with .nosync
+*.nosync
+
 # example notebook
 algonauts_2023_challenge_tutorial.ipynb
 
