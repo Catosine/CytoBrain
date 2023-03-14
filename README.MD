@@ -35,8 +35,8 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 
 ### Experiments: Preatrained Feature Modelling
-| Subject | Feature          | Model   | 5-Fold Validation Median Pearons's R (Left) | 5-Fold Validation Median Pearons's R (Right) | Figures                                           | Note     |  
-| ------  | ---------------- | ------- | ------------------------------------------- | -------------------------------------------- | ------------------------------------------------- | -------- |  
+| Subject | Feature          | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
+| ------  | ---------------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
 | Subj01  | resnet50-avgpool | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline/random crop 256 |
 | Subj01  | resnet50-avgpool | RidgeR  | 0.376                         | 0.376                          | [fig](./img/ridge_resnet50_full_img_alpha_2e4/histogram_pearson_20230309171821.png) | alpha=2e4/full img |
 | Subj01  | resnet50-layer3  | RidgeR  | 0.391                         | 0.392                          | [fig](./img/ridge_resnet50_layer3_full_img_alpha_1e3/histogram_pearson_20230314103838.png) | alpha=1e3/full img/avgpool |
