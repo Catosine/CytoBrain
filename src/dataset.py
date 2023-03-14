@@ -157,7 +157,7 @@ class Algonauts2023Feature(Dataset):
         return feature, self.fmri[feat_idx] if self.train else 0
 
 
-def get_dataset(data_path: str, extractor: str, layer: str, train: bool = True):
+def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True):
 
     path_struct = osp.join(data_path, "{}_split")
 
@@ -174,16 +174,23 @@ def get_dataset(data_path: str, extractor: str, layer: str, train: bool = True):
     else:
         feature_path = osp.join(
             path_struct.format("test"), "test_features")
-
-    feature_path = osp.join(feature_path, extractor, layer)
+    
+    img_files = [x.split(".")[0]+".npy" for x in os.listdir(shared_path.format("images"))]
 
     features = list()
     lfmris = list()
     rfmris = list()
-    for f in os.listdir(feature_path):
 
-        features.append(np.load(osp.join(feature_path, f)).astype(np.float32))
-        feat_idx = int(re.findall("\d{4}", f)[0]) - 1
+    for img in img_files:
+        
+        feat = None
+        for l in layer:
+            tmp = osp.join(feature_path, extractor, l, img)
+            feat = np.load(tmp).astype(np.float32) if feat is None else np.concatenate(
+                [feat, np.load(tmp).astype(np.float32)])
+        
+        features.append(feat)
+        feat_idx = int(re.findall("\d{4}", img)[0]) - 1
         lfmris.append(lfmri[feat_idx] if train else np.ones(1))
         rfmris.append(rfmri[feat_idx] if train else np.ones(1))
 

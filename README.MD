@@ -8,7 +8,7 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## Quick Start
 ```Bash
-    # To start a training
+    # To start a training for end2end model
     python task_train.py --data ./data --subject subj01
 ```
 
@@ -27,18 +27,24 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 - Rigid/Lasso Regression
 - Elastic Net (L1+L2)
 
-## Experiment Results
-### Preatrained Feature Modelling
-| Subject | Feature           | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
-| ------  | ----------------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
-| Subj01  | resnet50-avgpool  | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline/random crop 256 |
-| Subj01  | resnet50-avgpool  | RidgeR  | 0.250                         | 0.249                          | [fig](./img/ridge_baseline/histogram_pearson_20230308144134.png) | baseline/random crop 256 |
-| Subj01  | resnet50-avgpool  | RidgeR  | 0.358                         | 0.361                          | [fig](./img/ridge_baseline/histogram_pearson_20230308144134.png) | alpha=1e5/random crop 256 |
-| Subj01  | resnet50-avgpool | RidgeR  | 0.375                         | 0.374                          | [fig](./img/ridge_resnet50_full_img_alpha_1e4/histogram_pearson_20230309171031.png) | alpha=1e4/full img |
+## Results
+### Submission
+| Method | Test Median Pearons's R (Left) | Test Median Pearons's R (Right) | Note     |  
+| ------ | ------------------------------ | ------------------------------- | -------- |  
+| RidgeR | NA                             | NA                              |          |
+
+
+### Experiments: Preatrained Feature Modelling
+| Subject | Feature          | Model   | 5-Fold Validation Median Pearons's R (Left) | 5-Fold Validation Median Pearons's R (Right) | Figures                                           | Note     |  
+| ------  | ---------------- | ------- | ------------------------------------------- | -------------------------------------------- | ------------------------------------------------- | -------- |  
+| Subj01  | resnet50-avgpool | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline/random crop 256 |
 | Subj01  | resnet50-avgpool | RidgeR  | 0.376                         | 0.376                          | [fig](./img/ridge_resnet50_full_img_alpha_2e4/histogram_pearson_20230309171821.png) | alpha=2e4/full img |
-| Subj01  | resnet152-avgpool | RidgeR  | 0.355                         | 0.357                          | [fig](./img/ridge_resnet152_alpha_1e5/histogram_pearson_20230309141541.png) | alpha=1e5/random crop 256 |
+| Subj01  | resnet50-layer3  | RidgeR  | 0.391                         | 0.392                          | [fig](./img/ridge_resnet50_layer3_full_img_alpha_1e3/histogram_pearson_20230314103838.png) | alpha=1e3/full img/avgpool |
+| Subj01  | resnet50-layer2  | RidgeR  | 0.328                         | 0.316                          | [fig](./img/ridge_resnet50_layer2_full_img_alpha_1e2/histogram_pearson_20230314105409.png) | alpha=1e2/full img/avgpool |
+| Subj01  | resnet50-layer1  | RidgeR  | 0.288                         | 0.282                          | [fig](./img/ridge_resnet50_layer1_full_img_alpha_1e1/histogram_pearson_20230314110252.png) | alpha=1e1/full img/avgpool |
+| Subj01  | resnet50-layer3+avgpool | RidgeR  | 0.398                         | 0.394                          | [fig](./img/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png) | alpha=1e4/full img |
+| Subj01  | resnet50-layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | [fig](./img/ridge_resnet50_layer1234_img_alpha_1e3/histogram_pearson_20230314152330.png) | alpha=1e3/full img |
 
 
 ### Best Figure
-![](./img/ridge_resnet50_full_img_alpha_2e4/histogram_pearson_20230309171821.png)
-![](./img/ridge_resnet50_full_img_alpha_2e4/box_pearson_20230309171829.png)
+![fig](./img/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png)
