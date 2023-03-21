@@ -10,6 +10,7 @@
 # 　| (￣ヽ＿_ヽ_)__)
 # 　＼二つ ；
 import numpy as np
+from scipy.stats import pearsonr
 import torch
 import torch.nn as nn
 from torch.utils.data.dataset import Subset
@@ -120,7 +121,7 @@ def build_transform(subj, train=True):
     return tf
 
 
-def compute_pearson(pred, target):
+def compute_pearson_torch(pred, target):
     
     """
         Compute pearson correlation coefficient
@@ -135,6 +136,17 @@ def compute_pearson(pred, target):
         pearson.append(torch.corrcoef(torch.stack((p, t)))[0][1])
 
     return torch.stack(pearson)
+
+
+def compute_perason_numpy(pred, target):
+
+    corrcoef = list()
+    for pred, target in zip(pred.T, target.T):
+
+        s, _ = pearsonr(x=pred, y=target)
+        corrcoef.append(s)
+
+    return np.array(corrcoef)
 
 
 def build_train_script(args):
@@ -154,7 +166,7 @@ if __name__ == "__main__":
     a = torch.rand(16, 128)
     b = torch.rand(16, 128)
 
-    p = compute_pearson(a, b)
+    p = compute_pearson_torch(a, b)
     print(p)
     print(p.shape)
 

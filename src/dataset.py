@@ -115,12 +115,13 @@ class Algonauts2023Feature(Dataset):
         if train:
             shared_path = osp.join(
                 path_struct.format("training"), "training_{}")
+            fmri_path = shared_path.format("fmri")
             if hemisphere == "L":
-                self.fmri = np.load(osp.join(shared_path.format(
-                    "fmri"), "lh_training_fmri.npy"))
+                self.fmri = np.load(
+                    osp.join(fmri_path, "lh_training_fmri.npy"))
             elif hemisphere == "R":
-                self.fmri = np.load(osp.join(shared_path.format(
-                    "fmri"), "rh_training_fmri.npy"))
+                self.fmri = np.load(
+                    osp.join(fmri_path, "rh_training_fmri.npy"))
 
             self.feature_path = shared_path.format("features")
 
@@ -164,10 +165,11 @@ def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True)
     if train:
         shared_path = osp.join(
             path_struct.format("training"), "training_{}")
-        lfmri = np.load(osp.join(shared_path.format(
-            "fmri"), "lh_training_fmri.npy"))
-        rfmri = np.load(osp.join(shared_path.format(
-            "fmri"), "rh_training_fmri.npy"))
+        fmri_path = shared_path.format("fmri")
+        print("Using fMRI from: {}".format(fmri_path))
+
+        lfmri = np.load(osp.join(fmri_path, "lh_training_fmri.npy"))
+        rfmri = np.load(osp.join(fmri_path, "rh_training_fmri.npy"))
 
         feature_path = shared_path.format("features")
 
@@ -175,7 +177,10 @@ def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True)
         feature_path = osp.join(
             path_struct.format("test"), "test_features")
     
-    img_files = [x.split(".")[0]+".npy" for x in os.listdir(shared_path.format("images"))]
+    print("Using data from: {}".format(feature_path))
+
+    img_files = [
+        x.split(".")[0]+".npy" for x in os.listdir(osp.join(feature_path.format("images"), extractor, layer[0]))]
 
     features = list()
     lfmris = list()

@@ -16,7 +16,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from src.dataset import Algonauts2023Raw
-from src.utils import train_dev_split, build_optimizer, build_model, build_transform, compute_pearson
+from src.utils import train_dev_split, build_optimizer, build_model, build_transform, compute_pearson_torch
 from src.arg_parse import train_argParse
 from src.initialize import train_initialize
 from src.trainer import NNTrainer
@@ -54,7 +54,7 @@ def main(args):
         optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
 
     # setup scoring function
-    scoring_fn = compute_pearson
+    scoring_fn = compute_pearson_torch
 
     # setup criterion
     criterion = nn.MSELoss()

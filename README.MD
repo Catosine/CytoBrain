@@ -29,13 +29,13 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## Results
 ### Submission
-| Method | Test Median Pearons's R (Left) | Test Median Pearons's R (Right) | Note     |  
+| Method | Test Median Pearson's R (Left) | Test Median Pearson's R (Right) | Note     |  
 | ------ | ------------------------------ | ------------------------------- | -------- |  
 | RidgeR | NA                             | NA                              |          |
 
 
 ### Experiments: Preatrained Feature Modelling
-| Subject | Feature          | Model   | Dev Median Pearons's R (Left) | Dev Median Pearons's R (Right) | Figures                                           | Note     |  
+| Subject | Feature          | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Figures                                           | Note     |  
 | ------  | ---------------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
 | Subj01  | resnet50-avgpool | LinearR | 0.243                         | 0.245                          | [fig](./img/linear_regression_baseline/histogram_pearson_20230308144134.png) | baseline/random crop 256 |
 | Subj01  | resnet50-avgpool | RidgeR  | 0.376                         | 0.376                          | [fig](./img/ridge_resnet50_full_img_alpha_2e4/histogram_pearson_20230309171821.png) | alpha=2e4/full img |
