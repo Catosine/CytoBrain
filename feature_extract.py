@@ -59,6 +59,10 @@ def main(args):
         # load img
         img_data = cv2.imread(osp.join(args.data, img)
                               ).astype(np.float32)
+        
+        # convert BGR to RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
         img_data = tf(img_data)
         img_data.to(args.device)
 

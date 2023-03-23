@@ -80,6 +80,9 @@ class Algonauts2023Raw(Dataset):
 
         img = cv2.imread(osp.join(self.feature_path, feat_file)
                          ).astype(np.float32)
+        
+        # convert BGR to RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         if self.transform:
             img = self.transform(img)
