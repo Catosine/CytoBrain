@@ -153,3 +153,6 @@ features
 # ignore all pretrained models
 **/**/*.pt[h]
 **/**/*.npy
+
+# ignore all debugs
+*debug*
