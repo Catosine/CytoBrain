@@ -78,8 +78,7 @@ class Algonauts2023Raw(Dataset):
         feat_file = self.dataset[index]
         feat_idx = int(re.findall("\d{4}", feat_file)[0]) - 1
 
-        img = cv2.imread(osp.join(self.feature_path, feat_file)
-                         ).astype(np.float32)
+        img = cv2.imread(osp.join(self.feature_path, feat_file)).astype(np.float32)
         
         # convert BGR to RGB
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -207,9 +206,9 @@ def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True)
 
 if __name__ == "__main__":
 
-    dataset = Algonauts2023Feature("/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01",
-                                   extractor="resnet50-imagenet1k-v2", layer="avgpool", train=True)
+    from torchvision.transforms import ToTensor
+    dataset = Algonauts2023Raw("/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01", transform=ToTensor())
 
-    feat, fmri = dataset[0]
-    print(feat.shape)
-    print(fmri.shape)
+    img, fmri = dataset[0]
+
+    print(img)
