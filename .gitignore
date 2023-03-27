@@ -156,3 +156,6 @@ features
 
 # ignore all debugs
 *debug*
+
+# ignore all bash script
+*.sh

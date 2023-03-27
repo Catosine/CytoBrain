@@ -54,6 +54,9 @@ def main(args):
     print("Start feature extraction")
     args.data = osp.join(args.data, args.subject,
                          "training_split/training_images" if args.train else "test_split/test_images")
+    
+    print("Data retrieved from: {}".format(args.data))
+
     for img in tqdm(os.listdir(args.data)):
 
         # load img

@@ -78,8 +78,9 @@ class Algonauts2023Raw(Dataset):
         feat_file = self.dataset[index]
         feat_idx = int(re.findall("\d{4}", feat_file)[0]) - 1
 
-        img = cv2.imread(osp.join(self.feature_path, feat_file)).astype(np.float32)
-        
+        img = cv2.imread(osp.join(self.feature_path, feat_file)
+                         ).astype(np.float32)
+
         # convert BGR to RGB
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -160,7 +161,7 @@ class Algonauts2023Feature(Dataset):
         return feature, self.fmri[feat_idx] if self.train else 0
 
 
-def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True):
+def get_features(data_path: str, extractor: str, layer: list, train: bool = True):
 
     path_struct = osp.join(data_path, "{}_split")
 
@@ -178,7 +179,7 @@ def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True)
     else:
         feature_path = osp.join(
             path_struct.format("test"), "test_features")
-    
+
     print("Using data from: {}".format(feature_path))
 
     img_files = [
@@ -189,25 +190,25 @@ def get_dataset(data_path: str, extractor: str, layer: list, train: bool = True)
     rfmris = list()
 
     for img in img_files:
-        
-        feat = None
-        for l in layer:
-            tmp = osp.join(feature_path, extractor, l, img)
-            feat = np.load(tmp).astype(np.float32) if feat is None else np.concatenate(
-                [feat, np.load(tmp).astype(np.float32)])
-        
+
+        # load features from all layers and concat them together
+        feat = np.hstack([np.load(osp.join(feature_path, extractor, l, img)
+                                  ).astype(np.float32) for l in layer])
         features.append(feat)
+
+        # get fmri id
         feat_idx = int(re.findall("\d{4}", img)[0]) - 1
         lfmris.append(lfmri[feat_idx] if train else np.ones(1))
         rfmris.append(rfmri[feat_idx] if train else np.ones(1))
 
-    return np.stack(features), np.stack(lfmris), np.stack(rfmris)
+    return np.vstack(features), np.vstack(lfmris), np.vstack(rfmris)
 
 
 if __name__ == "__main__":
 
     from torchvision.transforms import ToTensor
-    dataset = Algonauts2023Raw("/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01", transform=ToTensor())
+    dataset = Algonauts2023Raw(
+        "/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01", transform=ToTensor())
 
     img, fmri = dataset[0]
 
