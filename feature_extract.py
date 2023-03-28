@@ -80,7 +80,7 @@ def main(args):
                     os.makedirs(osp.join(args.save_path, k))
 
                 np.save(osp.join(args.save_path, k, "{}.npy".format(
-                    img.split(".")[0])), v.detach().cpu().numpy().astype(np.float32))
+                    img.split(".")[0])), v.cpu().numpy().astype(np.float32))
 
     print("Done.")
 

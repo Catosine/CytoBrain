@@ -60,6 +60,11 @@ class Algonauts2023Raw(Dataset):
 
         self.dataset = list(os.listdir(self.feature_path))
 
+        # sorted in ascending order if not train set
+        if not train:
+            self.dataset = sorted(self.dataset, key=lambda x: int(
+                re.findall("\d{4}", x)[0]) - 1)
+
     def __len__(self):
         return len(self.dataset)
 
@@ -136,6 +141,11 @@ class Algonauts2023Feature(Dataset):
 
         self.dataset = list(os.listdir(self.feature_path))
 
+        # sorted in ascending order if not train set
+        if not train:
+            self.dataset = sorted(self.dataset, key=lambda x: int(re.findall("\d{4}", x)[0]) - 1)
+
+
     def __len__(self):
         return len(self.dataset)
 
@@ -182,13 +192,16 @@ def get_features(data_path: str, extractor: str, layer: list, train: bool = True
 
     print("Using data from: {}".format(feature_path))
 
-    img_files = [
-        x.split(".")[0]+".npy" for x in os.listdir(osp.join(feature_path.format("images"), extractor, layer[0]))]
+    # get all file names
+    img_files = os.listdir(osp.join(feature_path, extractor, layer[0]))
+
+    # sorted in ascending order if not train
+    if not train:
+        img_files = sorted(img_files, key= lambda x:int(re.findall("\d{4}", x)[0]) - 1)
 
     features = list()
     lfmris = list()
     rfmris = list()
-
     for img in img_files:
 
         # load features from all layers and concat them together
@@ -201,15 +214,12 @@ def get_features(data_path: str, extractor: str, layer: list, train: bool = True
         lfmris.append(lfmri[feat_idx] if train else np.ones(1))
         rfmris.append(rfmri[feat_idx] if train else np.ones(1))
 
-    return np.vstack(features), np.vstack(lfmris), np.vstack(rfmris)
+    return np.vstack(features), lfmris, rfmris
 
 
 if __name__ == "__main__":
 
-    from torchvision.transforms import ToTensor
-    dataset = Algonauts2023Raw(
-        "/Users/cytosine/Documents/Algonauts2023/data.nosync/subj01", transform=ToTensor())
-
-    img, fmri = dataset[0]
-
-    print(img)
+    f, l, r = get_features("../../data.nosync/subj01", "resnet50-imagenet1k-v2", ["avgpool"], True)
+    print(f.shape)
+    print(l.shape)
+    print(r.shape)
