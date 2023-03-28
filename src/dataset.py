@@ -214,7 +214,7 @@ def get_features(data_path: str, extractor: str, layer: list, train: bool = True
         lfmris.append(lfmri[feat_idx] if train else np.ones(1))
         rfmris.append(rfmri[feat_idx] if train else np.ones(1))
 
-    return np.vstack(features), lfmris, rfmris
+    return np.vstack(features), np.vstack(lfmris), np.vstack(rfmris)
 
 
 if __name__ == "__main__":

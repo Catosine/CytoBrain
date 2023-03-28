@@ -29,9 +29,10 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## Results
 ### Submission
-| Method | Test Median Pearson's R (Left) | Test Median Pearson's R (Right) | Note     |  
-| ------ | ------------------------------ | ------------------------------- | -------- |  
-| RidgeR | NA                             | NA                              |          |
+| Method | Test Median Pearson's R (Left) | Test Median Pearson's R (Right) | Note                  |  
+| ------ | ------------------------------ | ------------------------------- | --------------------- |  
+| RidgeR | NA                             | NA                              | res50(avgpool)        |
+| RidgeR | NA                             | NA                              | res50(layer3+avgpool) |
 
 
 ### Experiments: Preatrained Feature Modelling
