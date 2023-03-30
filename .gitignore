@@ -135,6 +135,9 @@ dmypy.json
 # submission
 *submission*
 
+# but submit the notebook
+!submission.ipynb
+
 # anything with .nosync
 *.nosync
 
