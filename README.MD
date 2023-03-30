@@ -34,7 +34,7 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 | RidgeR | 38.406                  | res50(layer3+avgpool) | [fig](./submission.nosync/ridge_resnet50_layer3%2Bavgpool/output_file/Submission_Report_Summary.svg) |  
 
 ### Best Submission
-![fig](./submission.nosync/ridge_resnet50_layer3%2Bavgpool/output_file/Submission_Report_Summary.svg)
+![fig](./img/Submission_Report_Summary.svg)
 
 ### Experiments: Preatrained Feature Modelling
 | Subject | Feature          | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Figures                                           | Note     |  
