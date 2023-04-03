@@ -46,7 +46,7 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 | Subj01  | resnet50-layer1  | RidgeR  | 0.288                         | 0.282                          | [fig](./img/ridge_resnet50_layer1_full_img_alpha_1e1/histogram_pearson_20230314110252.png) | alpha=1e1/full img/avgpool |
 | Subj01  | resnet50-layer3+avgpool | RidgeR  | 0.398                         | 0.394                          | [fig](./img/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png) | alpha=1e4/full img |
 | Subj01  | resnet50-layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | [fig](./img/ridge_resnet50_layer1234_img_alpha_1e3/histogram_pearson_20230314152330.png) | alpha=1e3/full img |
-
+| Subj01  | [vit-gpt2-image-captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)-encoder | RidgeR  | 0.350                         | 0.345                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_alpha_1e4/histogram_pearson_20230403153120.png) | alpha=1e4/full img |
 
 ### Best Figure
 ![fig](./img/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png)
