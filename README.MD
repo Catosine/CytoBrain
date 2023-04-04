@@ -28,7 +28,7 @@ Please see [example notebook](example.ipynb)
 ### Submission
 | Method | Test Median Pearson's R | Note                  | fig |  
 | ------ | ----------------------- | --------------------- | --- | 
-| RidgeR | 38.406                  | res50(layer3+avgpool) | [fig](./submission.nosync/ridge_resnet50_layer3%2Bavgpool/output_file/Submission_Report_Summary.svg) |  
+| RidgeR | 38.406                  | res50(layer3+avgpool) | [fig](./img/Submission_Report_Summary.svg) |  
 
 ### Best Submission
 ![fig](./img/Submission_Report_Summary.svg)
