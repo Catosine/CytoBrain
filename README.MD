@@ -51,6 +51,7 @@ Please see [example notebook](example.ipynb)
 | Subj01  | [vit-gpt2-image-captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)-encoder-avg-197 | RidgeR  | 0.143                         | 0.150                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_197_alpha_1/histogram_pearson_20230404153025.png) | alpha=1 |
 | Subj01  | [vit-gpt2-image-captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)-encoder-avg-768 | RidgeR  | 0.338                         | 0.335                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_768_alpha_1/histogram_pearson_20230404152848.png) | alpha=1 |
 | Subj01  | [vit-gpt2-image-captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)-encoder-avg-768 | RidgeR  | 0.378                         | 0.379                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_768_alpha_1e4/histogram_pearson_20230404154228.png) | alpha=1e4 |
+| Subj01  | [vit-gpt2-image-captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)-encoder-cls | RidgeR  | 0.370                         | 0.370                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_cls_alpha_1e4/histogram_pearson_20230404162304.png) | alpha=1e4 |
 
 ### Best Figure
-![fig](./img/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png)
+![fig](./img/resnet/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png)
