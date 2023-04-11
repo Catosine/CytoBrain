@@ -26,9 +26,10 @@ Please see [example notebook](example.ipynb)
 
 ## Results
 ### Submission
-| Method | Test Median Pearson's R | Note                  | fig |  
-| ------ | ----------------------- | --------------------- | --- | 
-| RidgeR | 38.406                  | res50(layer3+avgpool) | [fig](./img/Submission_Report_Summary.svg) |  
+| Method | Test Median Pearson's R | Note                  |  
+| ------ | ----------------------- | --------------------- |  
+| RidgeR | 38.406                  | res50(layer3+avgpool) |
+| RidgeR | 49.793                  | [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)(Last4Layer) |  
 
 ### Best Submission
 ![fig](./img/Submission_Report_Summary.svg)
@@ -45,7 +46,7 @@ Please see [example notebook](example.ipynb)
 | Subj01  | layer3+avgpool | RidgeR  | 0.398                         | 0.394                          | [fig](./img/resnet/ridge_resnet50_layer3%2Bavgpool_full_img_alpha_1e4/histogram_pearson_20230314144609.png) | alpha=1e4 |
 | Subj01  | layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | [fig](./img/resnet/ridge_resnet50_layer1234_img_alpha_1e3/histogram_pearson_20230314152330.png) | alpha=1e3 |
 
-#### [ViT-GPT2 Image Captioning]((https://huggingface.co/nlpconnect/vit-gpt2-image-captioning))
+#### [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)
 | Subject | Feature          | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Figures                                           | Note     |  
 | ------  | ---------------- | ------- | ----------------------------- | ------------------------------ | ------------------------------------------------- | -------- |  
 | Subj01  | encoder-pca-512 | RidgeR  | 0.394                         | 0.393                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_512_alpha_1/histogram_pearson_20230403181928.png) | alpha=1 |
@@ -57,4 +58,5 @@ Please see [example notebook](example.ipynb)
 | Subj01  | decoder-avg-768 | RidgeR  | 0.378                         | 0.379                          | [fig](./img/ridge_vit-gpt2-image-captioning_decoder_avg_768_alpha_1e4/histogram_pearson_20230407152340.png) | alpha=1e4 |
 | Subj01  | decoder-cls | RidgeR  | 0.371                         | 0.370                          | [fig](./img/ridge_vit-gpt2-image-captioning_decoder_cls_alpha_1e4/histogram_pearson_20230407152957.png) | alpha=1e4 |
 | Subj01  | decoder-last4-pca-512 | RidgeR  | 0.446                         | 0.442                          | [fig](./img/ridge_vit-gpt2-image-captioning_decoder_last4_pca_512_alpha_2e3/histogram_pearson_20230410133526.png) | alpha=2e3 |
+| Subj01  | decoder-last1234-pca-512 | RidgeR  | 0.454                         | 0.449                          | [fig](./img/ridge_vit-gpt2-image-captioning_decoder_last1234_pca_512_alpha_5e5/histogram_pearson_20230410135111.png) | alpha=5e5 |
 | Subj01  | encoder+decoder_pca_512 | RidgeR  | 0.405                         | 0.399                          | [fig](./img/ridge_vit-gpt2-image-captioning_encoder_pca_512%2Bdecoder_pca_512_alpha_1e6/histogram_pearson_20230407154405.png) | alpha=1e6 |
