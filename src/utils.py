@@ -161,6 +161,17 @@ def build_train_script(args):
     return command
 
 
+def my_collate_fn(x):
+
+    imgs = list()
+    ids = list()
+    for img, _, id in x:
+        imgs.append(img)
+        ids.append(id)
+
+    return imgs, ids
+
+
 if __name__ == "__main__":
 
     a = torch.rand(16, 128)

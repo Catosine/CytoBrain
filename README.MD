@@ -12,17 +12,36 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 # Extract train set features of subj01 via pretrained Resnet50
 python feature_extract.py --subject subj01 --train \ 
         --save_path ~/data/subj01/training_split/test_features \
-        --pretrained_weight ~/backbone/resnet50-imagenet1k-v2.pth \ 
+        --pretrained_weights ~/backbone/resnet50-imagenet1k-v2.pth \ 
         --layers layer3 avgpool
 
 # Also extract test set features of subj01 via pretrained Resnet50
 python feature_extract.py --subject subj01 \ 
-        --save_path ~/data/subj01/training_split/test_features \
-        --pretrained_weight ~/backbone/resnet50-imagenet1k-v2.pth \ 
+        --save_path ~/data/subj01/test_split/test_features \
+        --pretrained_weights ~/backbone/resnet50-imagenet1k-v2.pth \ 
         --layers layer3 avgpool
+
+# Or, extract train set features of last 4 layer of image captioning model
+python hf_feature_extract.py --subject subj01 --train \
+        --save_path ~/data/subj01/training_split/training_features \
+        --pretrained_weights nlpconnect/vit-gpt2-image-captioning \
+        --feature_type decoder
+
+# And same to test set
+python hf_feature_extract.py --subject subj01 \
+        --save_path ~/data/subj01/training_split/training_features \
+        --pretrained_weights nlpconnect/vit-gpt2-image-captioning \
+        --feature_type decoder
 ```
+
+### Feature Decomposition Via PCA
+TBU
+
 ### Modelling
 Please see [example notebook](example.ipynb)
+
+### Submission
+TBU
 
 ## Results
 ### Submission
