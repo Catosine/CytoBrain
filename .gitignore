@@ -134,6 +134,7 @@ dmypy.json
 
 # submission
 *submission*
+!img/Submission_Report_Summary.svg
 
 # but submit the notebook
 *.ipynb
