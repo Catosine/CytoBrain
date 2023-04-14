@@ -136,15 +136,12 @@ dmypy.json
 *submission*
 
 # but submit the notebook
+*.ipynb
 !submission.ipynb
 !example.ipynb
-*.ipynb
 
 # anything with .nosync
 *.nosync
-
-# example notebook
-algonauts_2023_challenge_tutorial.ipynb
 
 # ignore all txt file except requirements.txt
 *.txt
