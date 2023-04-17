@@ -162,3 +162,7 @@ features
 
 # ignore all bash script
 *.sh
+
+# ignore all images
+img/*
+!img/Submission_Report_Summary.svg
