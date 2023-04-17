@@ -41,7 +41,7 @@ TBU
 Please see [example notebook](example.ipynb)
 
 ### Submission
-TBU
+Please see [submission notebook](submission.ipynb)
 
 ## Results
 ### Submission
