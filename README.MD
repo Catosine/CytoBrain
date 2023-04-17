@@ -4,10 +4,13 @@ This is a repository for [Algonauts2023 competition](http://algonauts.csail.mit.
 Developed by [@Cytosine](https://github.com/Catosine)
 
 ## Dataset
+
 You may access the dataset from [here](https://naturalscenesdataset.org)
 
 ## Quick Start
+
 ### Feature Extraction
+
 ```Bash
 # Extract train set features of subj01 via pretrained Resnet50
 python feature_extract.py --data ~/algonauts2023/data --subject subj01 --train \ 
@@ -35,26 +38,34 @@ python hf_feature_extract.py --data ~/algonauts2023/data --subject subj01 \
 ```
 
 ### Feature Decomposition Via PCA
+
 TBU
 
 ### Modelling
+
 Please see [example notebook](example.ipynb)
 
 ### Submission
+
 Please see [submission notebook](submission.ipynb)
 
 ## Results
+
 ### Submission
+
 | Method | Test Median Pearson's R | Note                  |  
 | ------ | ----------------------- | --------------------- |  
 | RidgeR | 38.406                  | res50(layer3+avgpool) |
 | RidgeR | 49.793                  | [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)(Last4Layer) |  
 
 ### Best Submission
+
 ![fig](./img/Submission_Report_Summary.svg)
 
 ### Experiments: Preatrained Feature Modelling
+
 #### Resnet50
+
 | Subject | Feature          | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Note                     |  
 | ------- | ---------------- | ------- | ----------------------------- | ------------------------------ | ------------------------ |  
 | Subj01  | avgpool          | LinearR | 0.243                         | 0.245                          | baseline/random crop 256 |  
@@ -66,6 +77,7 @@ Please see [submission notebook](submission.ipynb)
 | Subj01  | layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | alpha=1e3                |  q
 
 #### [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)
+
 | Subject | Feature                       | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Note      |  
 | ------  | ----------------------------- | ------- | ----------------------------- | ------------------------------ | --------- |  
 | Subj01  | encoder-pca-512               | RidgeR  | 0.394                         | 0.393                          | alpha=1   |
