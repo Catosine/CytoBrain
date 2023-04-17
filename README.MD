@@ -10,26 +10,26 @@ You may access the dataset from [here](https://naturalscenesdataset.org)
 ### Feature Extraction
 ```Bash
 # Extract train set features of subj01 via pretrained Resnet50
-python feature_extract.py --subject subj01 --train \ 
-        --save_path ~/data/subj01/training_split/test_features \
+python feature_extract.py --data ~/algonauts2023/data --subject subj01 --train \ 
+        --save_path ~/algonauts2023/data/subj01/training_split/test_features \
         --pretrained_weights ~/backbone/resnet50-imagenet1k-v2.pth \ 
         --layers layer3 avgpool
 
 # Also extract test set features of subj01 via pretrained Resnet50
-python feature_extract.py --subject subj01 \ 
-        --save_path ~/data/subj01/test_split/test_features \
+python feature_extract.py --data ~/algonauts2023/data --subject subj01 \ 
+        --save_path ~/algonauts2023/data/subj01/test_split/test_features \
         --pretrained_weights ~/backbone/resnet50-imagenet1k-v2.pth \ 
         --layers layer3 avgpool
 
 # Or, extract train set features of last 4 layer of image captioning model
-python hf_feature_extract.py --subject subj01 --train \
-        --save_path ~/data/subj01/training_split/training_features \
+python hf_feature_extract.py --data ~/algonauts2023/data --subject subj01 --train \
+        --save_path ~/algonauts2023/data/subj01/training_split/training_features \
         --pretrained_weights nlpconnect/vit-gpt2-image-captioning \
         --feature_type decoder
 
 # And same to test set
-python hf_feature_extract.py --subject subj01 \
-        --save_path ~/data/subj01/training_split/training_features \
+python hf_feature_extract.py --data ~/algonauts2023/data --subject subj01 \
+        --save_path ~/algonauts2023/data/subj01/training_split/training_features \
         --pretrained_weights nlpconnect/vit-gpt2-image-captioning \
         --feature_type decoder
 ```
@@ -63,7 +63,7 @@ Please see [submission notebook](submission.ipynb)
 | Subj01  | layer2           | RidgeR  | 0.328                         | 0.316                          | alpha=1e2/avgpool        |  
 | Subj01  | layer1           | RidgeR  | 0.288                         | 0.282                          | alpha=1e1/avgpool        |  
 | Subj01  | layer3+avgpool   | RidgeR  | 0.398                         | 0.394                          | alpha=1e4                |  
-| Subj01  | layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | alpha=1e3                |  
+| Subj01  | layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | alpha=1e3                |  q
 
 #### [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)
 | Subject | Feature                       | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Note      |  
