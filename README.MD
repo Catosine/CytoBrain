@@ -65,9 +65,6 @@ Please see [submission notebook](submission.ipynb)
 | Subj01  | layer3+avgpool   | RidgeR  | 0.398                         | 0.394                          | alpha=1e4                |  
 | Subj01  | layer123+avgpool | RidgeR  | 0.391                         | 0.390                          | alpha=1e3                |  
 
-
-
-
 #### [ViT-GPT2 Image Captioning](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)
 | Subject | Feature                       | Model   | Dev Median Pearson's R (Left) | Dev Median Pearson's R (Right) | Note      |  
 | ------  | ----------------------------- | ------- | ----------------------------- | ------------------------------ | --------- |  
