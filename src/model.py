@@ -13,7 +13,7 @@ from typing import Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
-from torch.nn import MSELoss
+from torch.nn import MSELoss, CrossEntropyLoss
 from transformers import VisionEncoderDecoderModel, VisionEncoderDecoderConfig, PretrainedConfig, PreTrainedModel, AutoConfig, AutoModelForCausalLM, AutoModel
 from transformers.modeling_outputs import BaseModelOutput, Seq2SeqLMOutput
 from transformers.models.encoder_decoder.modeling_encoder_decoder import shift_tokens_right
@@ -325,7 +325,7 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         loss = None
         if labels is not None:
             logits = decoder_outputs.logits if return_dict else decoder_outputs[0]
-            loss_fct = MSELoss()
+            loss_fct = CrossEntropyLoss()
             loss = loss_fct(
                 logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
 
@@ -334,10 +334,6 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
                 return (loss,) + decoder_outputs + encoder_outputs
             else:
                 return decoder_outputs + encoder_outputs
-
-        regressor_output = self.regressor(
-            nn.Flatten(0, -1)(decoder_outputs.hidden_states[-4:])
-        )
 
         return Seq2SeqLMOutput(
             loss=loss,

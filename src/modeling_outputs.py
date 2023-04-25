@@ -15,6 +15,6 @@ from transformers import Seq2SeqLMOutput
 class Seq2SeqRegressorOutput(Seq2SeqLMOutput):
 
     def __init__(self, *args, **kwargs):
-        super(Seq2SeqLMOutput, self).__init__(*args, **kwargs):
+        super(Seq2SeqLMOutput, self).__init__(*args, **kwargs)
 
         pass

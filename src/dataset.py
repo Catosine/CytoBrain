@@ -24,12 +24,20 @@ class Algonauts2023Raw(Dataset):
         Load original data for Algonauts2023 dataset
     """
 
-    def __init__(self, data_path: str, hemisphere: str = "L", transform=None, train: bool = True, return_img_ids: bool = False, return_pil: bool = False):
+    def __init__(self, 
+                 data_path: str, 
+                 caption_file: str = None,
+                 hemisphere: str = "L", 
+                 transform = None, 
+                 train: bool = True, 
+                 return_img_ids: bool = False, 
+                 return_pil: bool = False):
         """
             Initialize a torch.utils.data.Dataset object for algonauts2023 dataset
 
             Args:
                 data_path,              str, path to the algonauts2023 dataset which contains only ONE subject
+                caption_file,           str, if provided, __getitem__() will return with a caption of the image
                 hemisphere,             str, select which hemisphere of the brain to be modeled
                                             can ONLY select "L" or "R"
                                             and ONLY applicable when train is TRUE
