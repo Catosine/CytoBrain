@@ -121,6 +121,66 @@ def build_transform(subj, train=True):
     return tf
 
 
+def build_regression_feats(decoder_embeds, encoder_embeds=None, method="cls"):
+    """
+        Build the features used for regression
+        Args:
+            decoder_embeds,         tuple of torch.Tensor, hidden states of decoder model
+            encoder_embeds,         tuple of torch.Tensor, hidden states of encoder model
+            method,                 str, method of how to build regression features
+
+        Returns:
+            embeds,                 torch.Tensor, the embeddings used for regressor
+    """
+
+    if method == "cls":
+
+        # use [CLS] feature of last layer of decoder as regression features
+        embeds = decoder_embeds[-1][:, 0]
+
+        # if encoder_embeds exists, then concat embeds with [CLS] feature of last layer of encoder
+        if encoder_embeds:
+            embeds = torch.concat([embeds, encoder_embeds[-1][:, 0]], dim=1)
+
+    elif method == "mean":
+
+        # use mean of last layer of decoder as regression features
+        embeds = decoder_embeds[-1].mean(dim=1)
+
+        # if encoder_embeds exists, then concat embeds with mean of last layer of encoder
+        if encoder_embeds:
+            embeds = torch.concat([embeds, encoder_embeds[-1].mean(dim=1)], dim=1)
+
+    elif method == "max":
+
+        # use mean of last layer of decoder as regression features
+        embeds = decoder_embeds[-1].max(1).values
+
+        # if encoder_embeds exists, then concat embeds with mean of last layer of encoder
+        if encoder_embeds:
+            embeds = torch.concat([embeds, encoder_embeds[-1].max(1).values], dim=1)
+
+    elif method == "last4":
+
+        # use mean of last 4 layer of decoder as regression features
+        embeds = torch.concat([
+            decoder_embeds[-4], decoder_embeds[-3],
+            decoder_embeds[-2], decoder_embeds[-1]
+        ], dim=1).mean(dim=1)
+
+        if encoder_embeds:
+            e_embeds = torch.concat([
+                encoder_embeds[-4], encoder_embeds[-3],
+                encoder_embeds[-2], encoder_embeds[-1]
+            ], dim=1).mean(dim=1)
+            embeds = torch.concat([embeds, e_embeds], dim=1)
+
+    else:
+        raise NotImplemented
+
+    return embeds
+
+
 def compute_pearson_torch(pred, target):
     
     """

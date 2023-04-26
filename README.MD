@@ -38,8 +38,18 @@ python hf_feature_extract.py --data ~/algonauts2023/data --subject subj01 \
 ```
 
 ### Feature Decomposition Via PCA
+The PCA is nothing special. Here is an example in case of need:
+```
+from sklearn.decomposition import PCA
 
-TBU
+# suppose the extracted feature are prepared as a numpy.ndarray in form of [#Samples, #Features]
+features = np.load("extracted_features.npy")
+
+pca = PCA(512)
+reduced_features = pca.fit_transform(features)
+
+```
+
 
 ### Modelling
 

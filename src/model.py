@@ -18,6 +18,9 @@ from transformers import VisionEncoderDecoderModel, VisionEncoderDecoderConfig, 
 from transformers.modeling_outputs import BaseModelOutput, Seq2SeqLMOutput
 from transformers.models.encoder_decoder.modeling_encoder_decoder import shift_tokens_right
 
+from .utils import build_regression_feats
+
+
 class FCN(nn.Module):
 
     def __iter_init_weights(self, x):
@@ -51,6 +54,8 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         config: Optional[PretrainedConfig] = None,
         encoder: Optional[PreTrainedModel] = None,
         decoder: Optional[PreTrainedModel] = None,
+        regressor_feature_method: str = "cls",
+        use_both_encoder_decoder_features: bool = False,
         regressor_out_features: Optional[int] = None,
         regressor_dropout_prob: Optional[float] = None
     ):
@@ -58,12 +63,16 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
 
         regressor_out_features = config.regressor_out_features if regressor_out_features is None else regressor_out_features
         regressor_dropout_prob = config.regressor_dropout_prob if regressor_dropout_prob is None else regressor_dropout_prob
+        regressor_in_features = 2 * \
+            config.decoder.hidden_size if use_both_encoder_decoder_features else config.decoder.hidden_size
+
+        self.regressor_feature_method = regressor_feature_method
+        self.use_both_encoder_decoder_features = use_both_encoder_decoder_features
 
         self.regressor = nn.Sequential(
-            FCN(in_features=self.config.decoder.hidden_size,
+            FCN(in_features=regressor_in_features,
                 out_features=2048, p=regressor_dropout_prob),
-            FCN(in_features=2048, out_features=4096, p=regressor_dropout_prob),
-            nn.Linear(in_features=8192, out_features=regressor_out_features)
+            nn.Linear(in_features=2048, out_features=regressor_out_features)
         )
 
     @classmethod
@@ -71,6 +80,8 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         cls,
         encoder_pretrained_model_name_or_path: str = None,
         decoder_pretrained_model_name_or_path: str = None,
+        regressor_feature_method: str = "cls",
+        use_both_encoder_decoder_features: bool = False,
         regressor_out_features: int = 2048,
         regressor_dropout_prob: float = 0.1,
         *model_args,
@@ -223,8 +234,12 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
 
         # make sure input & output embeddings is not tied
         config.tie_word_embeddings = False
-        return cls(encoder=encoder, decoder=decoder, config=config, regressor_out_features=regressor_out_features, regressor_dropout_prob=regressor_dropout_prob)
-    
+        return cls(encoder=encoder, decoder=decoder,
+                   config=config, regressor_out_features=regressor_out_features,
+                   regressor_dropout_prob=regressor_dropout_prob,
+                   regressor_feature_method=regressor_feature_method,
+                   use_both_encoder_decoder_features=use_both_encoder_decoder_features)
+
     def forward(
         self,
         pixel_values: Optional[torch.FloatTensor] = None,
@@ -234,6 +249,8 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         past_key_values: Optional[Tuple[Tuple[torch.FloatTensor]]] = None,
         decoder_inputs_embeds: Optional[torch.FloatTensor] = None,
         labels: Optional[torch.LongTensor] = None,
+        regression_target: Optional[torch.FloatTensor] = None,
+        loss_alpha: Optional[float] = 0.5,
         use_cache: Optional[bool] = None,
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
@@ -321,6 +338,11 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
             **kwargs_decoder,
         )
 
+        # construct regression embeddings
+        regression_embeds = build_regression_feats(
+            decoder_embeds=decoder_outputs.hidden_states, encoder_embeds=encoder_outputs.hidden_states if self.use_both_encoder_decoder_features else None, method=self.regressor_feature_method)
+        regression_logits = self.regressor(regression_embeds)
+
         # Compute loss independent from decoder (as some shift the logits inside them)
         loss = None
         if labels is not None:
@@ -328,6 +350,12 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
             loss_fct = CrossEntropyLoss()
             loss = loss_fct(
                 logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
+
+        if regression_target is not None:
+            reg_loss_fct = MSELoss()
+            reg_loss = reg_loss_fct(regression_logits, regression_target)
+
+            loss = reg_loss
 
         if not return_dict:
             if loss is not None:
