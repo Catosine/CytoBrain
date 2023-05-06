@@ -43,8 +43,8 @@ def train_initialize(args):
     __common_initialize(args)
 
     timestamp = time.strftime("%Y%m%d%H%M%S")
-    args.save_path = osp.join(args.save_path, "{timestamp}_{subj}_{hemisphere}_{model}_rs{rs}".format(
-        timestamp=timestamp, subj=args.subject, hemisphere=args.hemisphere, model=args.model, rs=args.seed))
+    args.save_path = osp.join(args.save_path, "{timestamp}_{subj}_{hemisphere}_rs{rs}".format(
+        timestamp=timestamp, subj=args.subject, hemisphere=args.hemisphere, rs=args.seed))
     if args.note:
         args.save_path += "_{}".format(args.note)
 

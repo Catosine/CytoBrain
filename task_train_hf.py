@@ -14,11 +14,12 @@ import os.path as osp
 
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader
 from transformers import BertTokenizer, ViTImageProcessor
 
 from src.dataset import Algonauts2023Raw
 from src.model import VisionEncoderDecoderRegressor as VEDR
-from src.utils import train_dev_split, build_optimizer, compute_pearson_torch
+from src.utils import train_dev_split, build_optimizer, compute_pearson_torch, my_training_collate_fn
 from src.arg_parse import train_argParse
 from src.initialize import train_initialize
 from src.trainer import NNTrainer
@@ -43,6 +44,9 @@ def main(args):
     fmri_size = train_set[0][1].shape[0]
     logging.info("Hemisphere FMRI size: {}".format(fmri_size))
 
+    train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=4)
+    val_loader = DataLoader(dev_set, batch_size=args.batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=4)
+
     # setup model
     #model = build_model(args.model, fmri_size, args.pretrained_weight)
     model = VEDR.from_pretrained(args.pretrained_weights, regressor_out_features=fmri_size,
@@ -58,7 +62,7 @@ def main(args):
     # setup optimizer & scheduler
     optimizer = build_optimizer(model, args.lr, args.lr_regressor)
     scheduler = optim.lr_scheduler.LinearLR(
-        optimizer, start_factor=1.0, end_factor=0.3, total_iters=100)
+        optimizer, start_factor=1.0, end_factor=0.3, total_iters=args.epoch*len(train_loader))
 
     # setup scoring function
     scoring_fn = compute_pearson_torch
@@ -71,8 +75,7 @@ def main(args):
                         scheduler, args.summarywriter, logging, args.save_path)
 
     # start training
-    trainer.run(train_set, dev_set, args.epoch,
-                args.batch_size, args.report_step)
+    trainer.run(train_loader, val_loader, args.epoch, args.report_step)
 
 
 if __name__ == "__main__":
