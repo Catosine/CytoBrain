@@ -232,6 +232,19 @@ def my_collate_fn(x):
     return imgs, ids
 
 
+def my_training_collate_fn(x):
+
+    imgs = list()
+    fmris = list()
+    captions = list()
+    for i, f, c in x:
+        imgs.append(i)
+        fmris.append(f)
+        captions.append(c)
+    
+    return imgs, fmris, captions
+
+
 if __name__ == "__main__":
 
     a = torch.rand(16, 128)

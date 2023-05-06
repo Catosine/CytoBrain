@@ -343,34 +343,36 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
             decoder_embeds=decoder_outputs.hidden_states, encoder_embeds=encoder_outputs.hidden_states if self.use_both_encoder_decoder_features else None, method=self.regressor_feature_method)
         regression_logits = self.regressor(regression_embeds)
 
-        # Compute loss independent from decoder (as some shift the logits inside them)
-        loss = None
-        if labels is not None:
-            logits = decoder_outputs.logits if return_dict else decoder_outputs[0]
-            loss_fct = CrossEntropyLoss()
-            loss = loss_fct(
-                logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
+        return regression_logits
 
-        if regression_target is not None:
-            reg_loss_fct = MSELoss()
-            reg_loss = reg_loss_fct(regression_logits, regression_target)
+        # # Compute loss independent from decoder (as some shift the logits inside them)
+        # loss = None
+        # if labels is not None:
+        #     logits = decoder_outputs.logits if return_dict else decoder_outputs[0]
+        #     loss_fct = CrossEntropyLoss()
+        #     loss = loss_fct(
+        #         logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
 
-            loss = reg_loss
+        # if regression_target is not None:
+        #     reg_loss_fct = MSELoss()
+        #     reg_loss = reg_loss_fct(regression_logits, regression_target)
 
-        if not return_dict:
-            if loss is not None:
-                return (loss,) + decoder_outputs + encoder_outputs
-            else:
-                return decoder_outputs + encoder_outputs
+        #     loss = reg_loss
 
-        return Seq2SeqLMOutput(
-            loss=loss,
-            logits=decoder_outputs.logits,
-            past_key_values=decoder_outputs.past_key_values,
-            decoder_hidden_states=decoder_outputs.hidden_states,
-            decoder_attentions=decoder_outputs.attentions,
-            cross_attentions=decoder_outputs.cross_attentions,
-            encoder_last_hidden_state=encoder_outputs.last_hidden_state,
-            encoder_hidden_states=encoder_outputs.hidden_states,
-            encoder_attentions=encoder_outputs.attentions,
-        )
+        # if not return_dict:
+        #     if loss is not None:
+        #         return (loss,) + decoder_outputs + encoder_outputs
+        #     else:
+        #         return decoder_outputs + encoder_outputs
+
+        # return Seq2SeqLMOutput(
+        #     loss=loss,
+        #     logits=decoder_outputs.logits,
+        #     past_key_values=decoder_outputs.past_key_values,
+        #     decoder_hidden_states=decoder_outputs.hidden_states,
+        #     decoder_attentions=decoder_outputs.attentions,
+        #     cross_attentions=decoder_outputs.cross_attentions,
+        #     encoder_last_hidden_state=encoder_outputs.last_hidden_state,
+        #     encoder_hidden_states=encoder_outputs.hidden_states,
+        #     encoder_attentions=encoder_outputs.attentions,
+        # )

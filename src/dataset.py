@@ -104,7 +104,7 @@ class Algonauts2023Raw(Dataset):
 
         if self.captions:
             tmp = feat_file[:-4]
-            cap = self.captions[tmp.split("_")[1].split("-")[-1]]
+            cap = self.captions[str(int(tmp.split("_")[1].split("-")[-1]))]
             # randomly pick one captions
             cap = np.random.choice(cap)
 

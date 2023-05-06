@@ -20,6 +20,8 @@ def __base_argParse(parser):
                         choices=["subj01", "subj02", "subj03", "subj04",
                                  "subj05", "subj06", "subj07", "subj08"],
                         help="Used to select which subject to learn")
+    parser.add_argument("--caption", type=str, default="./nsd_captions.json", help="Path to captions")
+    parser.add_argument("--use_pil", action="store_true", help="Use PIL when loading data")
     parser.add_argument("--hemisphere", type=str, choices=["L", "R"], default="L",
                         help="Select which half of the brain to model")
     parser.add_argument("--model", type=str, default="resnet50",

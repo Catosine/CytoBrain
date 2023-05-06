@@ -11,9 +11,12 @@
 # 　＼二つ ；
 import os.path as osp
 
+import numpy as np
 import torch
 import torch.utils.data as data
 from tqdm import tqdm
+
+from .utils import my_training_collate_fn
 
 
 class NNTrainer:
@@ -21,12 +24,14 @@ class NNTrainer:
         NN task trainer. Including train/validate/infer
     """
 
-    def __init__(self, model, criterion, scoring_fn, optimizer, scheduler, summarywriter, logging, save_path):
+    def __init__(self, model, feature_extractor, tokenizer, criterion, scoring_fn, optimizer, scheduler, summarywriter, logging, save_path):
         """
             Initialize the trainer
         """
 
         self.model = model
+        self.feature_extractor = feature_extractor
+        self.tokenizer = tokenizer
         self.criterion = criterion
         self.scoring_fn = scoring_fn
         self.optimizer = optimizer
@@ -50,9 +55,9 @@ class NNTrainer:
 
         # initializing dataloaders
         train_loader = data.DataLoader(
-            train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+            train_set, batch_size=batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=num_workers)
         val_loader = data.DataLoader(
-            val_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+            val_set, batch_size=batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=num_workers)
 
         train_step = 0
         dev_step = 0
@@ -65,9 +70,9 @@ class NNTrainer:
                 "==============<Epoch#{}>==============".format(e))
 
             # training
-            for img, fmri in tqdm(train_loader):
+            for img, fmri, caption in tqdm(train_loader):
 
-                _, score, loss = self.__batch_train(img, fmri)
+                _, score, loss = self.__batch_train(img, fmri, caption)
 
                 self.summarywriter.add_scalar(
                     "train/batch/loss", loss, train_step)
@@ -89,9 +94,9 @@ class NNTrainer:
             dev_loss = list()
             dev_pred = list()
             dev_fmri = list()
-            for img, fmri in tqdm(val_loader):
+            for img, fmri, caption in tqdm(val_loader):
 
-                pred, score, loss = self.__batch_val(img, fmri)
+                pred, score, loss = self.__batch_val(img, fmri, caption)
                 dev_pred.append(pred)
                 dev_fmri.append(fmri)
                 dev_loss.append(loss)
@@ -126,16 +131,22 @@ class NNTrainer:
 
         self.logging.info("Done.")
 
-    def __batch_train(self, img, fmri):
+    def __batch_train(self, img, fmri, caption):
 
         self.model.train()
 
         # load data to device
         device = next(self.model.parameters()).device
-        img = img.to(device)
-        fmri = fmri.to(device)
 
-        pred = self.model(img.to(device))
+        pixel_values = self.feature_extractor(img, return_tensors="pt")["pixel_values"]
+        pixel_values = pixel_values.to(device)
+
+        fmri = torch.FloatTensor(np.stack(fmri)).to(device)
+
+        labels = self.tokenizer(
+            caption, return_tensors="pt", padding=True).input_ids
+
+        pred = self.model(pixel_values=pixel_values, labels=labels, output_hidden_states=True)
         loss = self.criterion(pred, fmri)
         score = self.scoring_fn(pred, fmri)
 
@@ -148,24 +159,31 @@ class NNTrainer:
 
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
 
-    def __batch_val(self, img, fmri):
+    def __batch_val(self, img, fmri, caption):
 
         self.model.eval()
 
         # load data to device
         device = next(self.model.parameters()).device
-        img = img.to(device)
-        fmri = fmri.to(device)
+
+        pixel_values = self.feature_extractor(img, return_tensors="pt")["pixel_values"]
+        pixel_values = pixel_values.to(device)
+
+        fmri = torch.FloatTensor(np.stack(fmri)).to(device)
+
+        labels = self.tokenizer(
+            caption, return_tensors="pt", padding=True).input_ids
 
         with torch.no_grad():
-            pred = self.model(img)
+            pred = self.model(pixel_values=pixel_values,
+                              labels=labels, output_hidden_states=True)
             loss = self.criterion(pred, fmri)
             score = self.scoring_fn(pred, fmri)
 
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
 
     @staticmethod
-    def infer(model, dataset, batch_size=64, num_workers=4):
+    def infer(model, feature_extractor, tokenizer, dataset, batch_size=64, num_workers=4):
         """
             Inferring on given dataset
 
@@ -181,19 +199,23 @@ class NNTrainer:
 
         # init dataloader
         dataloader = data.DataLoader(
-            dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+            dataset, batch_size=batch_size, shuffle=False, collate_fn=my_training_collate_fn, num_workers=num_workers)
 
         results = list()
 
         device = next(model.parameters()).device
 
-        for img, _ in tqdm(dataloader):
+        for img, _, caption in tqdm(dataloader):
             model.eval()
 
-            img = img.to(device)
+            pixel_values = feature_extractor(img, return_tensors="pt")["pixel_values"]
+            pixel_values = pixel_values.to(device)
+
+            labels = tokenizer(caption, return_tensors="pt").input_ids
 
             with torch.no_grad():
-                pred = model(img)
+                pred = model(pixel_values=pixel_values,
+                             labels=labels, output_hidden_states=True)
                 results.append(pred.detach())
 
         return torch.stack(results).numpy()
