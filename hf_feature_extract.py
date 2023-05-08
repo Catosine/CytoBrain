@@ -24,7 +24,7 @@ from src.dataset import Algonauts2023Raw
 def parseArgs():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pretrained_weights", type=str, default="./backbone.nosync/vit-gpt2-image-captioning",
+    parser.add_argument("--pretrained_weights", type=str, default="../../backbone.nosync/vit-gpt2-image-captioning",
                         help="Pretrained weights for Huggingface models")
     parser.add_argument("--data", type=str,
                         default="../../data.nosync", help="Path to images")
