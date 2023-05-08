@@ -33,7 +33,7 @@ def train_dev_split(dset, train_ratio=0.8):
     return Subset(dset, train_idx), Subset(dset, dev_idx)
 
 
-def build_optimizer(model, lr, lr_regressor):
+def build_optimizer(model, lr, lr_regressor, regressor_kword="regressor"):
 
     lr_regressor = lr_regressor if lr_regressor else lr
 
@@ -44,7 +44,7 @@ def build_optimizer(model, lr, lr_regressor):
     backbone_param = list()
     backbone_param_no_decay = list()
     for n, p in param_optimizer:
-        if n.startswith(("fc")):
+        if n.startswith((regressor_kword)):
             if not any(nd in n for nd in no_decay):
                 regressor_param.append(p)
             else:
