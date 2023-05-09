@@ -38,6 +38,7 @@ channels:
   - https://mirrors.aliyun.com/anaconda/pkgs/free
   - defaults
 dependencies:
+  - _py-xgboost-mutex=2.0=cpu_0
   - absl-py=0.15.0=pyhd3eb1b0_0
   - aiohttp=3.8.4=py39h02fc5c5_0
   - aiosignal=1.3.1=pyhd8ed1ab_0
@@ -70,10 +71,10 @@ dependencies:
   - brotlipy=0.7.0=py39h02fc5c5_1005
   - bzip2=1.0.8=h3422bc3_4
   - c-ares=1.18.1=h3422bc3_0
-  - ca-certificates=2022.12.7=h4653dfc_0
+  - ca-certificates=2023.5.7=hf0a4a13_0
   - cachetools=4.2.2=pyhd3eb1b0_0
   - cairo=1.16.0=h73a0509_1014
-  - certifi=2022.12.7=pyhd8ed1ab_0
+  - certifi=2023.5.7=pyhd8ed1ab_0
   - cffi=1.15.1=py39h7e6b969_3
   - chardet=4.0.0=py39h2804cbe_3
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
@@ -175,6 +176,7 @@ dependencies:
   - libvpx=1.11.0=hc470f4d_3
   - libwebp-base=1.2.4=h57fd34a_0
   - libxcb=1.13=h9b22ae9_1004
+  - libxgboost=1.7.4=cpu_h13cf1d8_0
   - libxml2=2.10.3=h87b0503_0
   - libxslt=1.1.37=h1bd8bc4_0
   - libzlib=1.2.13=h03a7124_4
@@ -199,7 +201,7 @@ dependencies:
   - opencv=4.7.0=py39hdf13c20_1
   - openh264=2.3.1=hb7217d7_2
   - openjpeg=2.5.0=hbc2ba62_2
-  - openssl=3.1.0=h03a7124_0
+  - openssl=3.1.0=h53f4e23_3
   - orc=1.8.3=hef0d403_0
   - p11-kit=0.24.1=h29577a5_0
   - packaging=21.3=pyhd3eb1b0_0
@@ -224,6 +226,7 @@ dependencies:
   - ptyprocess=0.7.0=pyhd3deb0d_0
   - pure_eval=0.2.2=pyhd8ed1ab_0
   - py-opencv=4.7.0=py39h85045c0_1
+  - py-xgboost=1.7.4=cpu_py39h6861412_0
   - pyarrow=11.0.0=py39hfdcab31_13_cpu
   - pyasn1=0.4.8=py_0
   - pyasn1-modules=0.2.8=py_0
@@ -263,6 +266,7 @@ dependencies:
   - tensorboard=2.8.0=pyhd8ed1ab_1
   - tensorboard-data-server=0.6.1=py39he2a39a8_4
   - tensorboard-plugin-wit=1.6.0=py_0
+  - tensorboardx=2.2=pyhd3eb1b0_0
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.12=he1e0b03_0
   - tokenizers=0.13.2=py39h6120d9b_0
@@ -282,6 +286,7 @@ dependencies:
   - wheel=0.37.1=pyhd3eb1b0_0
   - x264=1!164.3095=h57fd34a_2
   - x265=3.5=hbc6ce65_3
+  - xgboost=1.7.4=cpu_py39h2fb42d7_0
   - xorg-libxau=1.0.9=h27ca646_0
   - xorg-libxdmcp=1.1.3=h27ca646_0
   - xxhash=0.8.1=h1a8c8d9_0
