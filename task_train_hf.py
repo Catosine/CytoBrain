@@ -15,7 +15,12 @@ import os.path as osp
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from transformers import BertTokenizer, ViTImageProcessor
+import transformers
+from transformers import BertTokenizer
+if transformers.__version__ >= "5.0.0":
+    from transformers import ViTImageProcessor as image_processor
+else:
+    from transformers import ViTFeatureExtractor as image_processor
 
 from src.dataset import Algonauts2023Raw
 from src.model import VisionEncoderDecoderRegressor as VEDR
@@ -56,7 +61,7 @@ def main(args):
     logging.info("Model initialized. Loaded to <{}> device.".format(args.device))
 
     # setup feature extractor and tokenizer
-    feat_extractor = ViTImageProcessor.from_pretrained(args.pretrained_weights)
+    feat_extractor = image_processor.from_pretrained(args.pretrained_weights)
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_weights)
 
     # setup optimizer & scheduler
