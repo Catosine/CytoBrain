@@ -101,15 +101,14 @@ class NNTrainer:
 
                 dev_step += 1
 
-            epoch_score = self.scoring_fn(
+            dev_score = self.scoring_fn(
                 torch.concat(dev_pred), torch.concat(dev_fmri))
 
             self.summarywriter.add_scalar(
-                "dev/epoch/avg. score", epoch_score.mean(), e)
+                "dev/epoch/avg. score", dev_score.mean(), e)
             self.summarywriter.add_scalar(
-                "dev/epoch/median score", epoch_score.median(), e)
+                "dev/epoch/median score", dev_score.median(), e)
 
-            dev_score = torch.concat(dev_score)
             dev_loss = torch.stack(dev_loss).mean()
 
             self.logging.info(
