@@ -48,6 +48,8 @@ def __train_argParse(parser):
     parser.add_argument("--lr_regressor", type=float,
                         help="Learing rate for regressor")
 
+    parser.add_argument("--early_stopping", type=int, default=0, help="Apply early stopping that stops training after N-nonimproving evaluations")
+    parser.add_argument("--eval_per_step", type=int, default=100, help="Run the devset evaluation every K step.")
     parser.add_argument("--report_step", type=int, default=10,
                         help="Num of report steps for logging")
 

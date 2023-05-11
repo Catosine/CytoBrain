@@ -40,7 +40,7 @@ class NNTrainer:
         self.logging = logging
         self.save_path = save_path
 
-    def run(self, train_loader, val_loader, epoch=100, report_step=20, num_workers=4):
+    def run(self, train_loader, val_loader, epoch=100, report_step=20):
         """
             Standard Training and validation
 
@@ -49,14 +49,7 @@ class NNTrainer:
                 val_loader,         torch.utils.dataset.data.Dataset, the validation set
                 epoch,              int, maximized training epoch
                 report_step,        int, report step
-                num_workers,        int, num workers for initializing dataloader
         """
-
-        # # initializing dataloaders
-        # train_loader = data.DataLoader(
-        #     train_set, batch_size=batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=num_workers)
-        # val_loader = data.DataLoader(
-        #     val_set, batch_size=batch_size, shuffle=True, collate_fn=my_training_collate_fn, num_workers=num_workers)
 
         train_step = 0
         dev_step = 0
