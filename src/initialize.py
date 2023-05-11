@@ -16,8 +16,8 @@ import sys
 import time
 
 import torch
-#from torch.utils.tensorboard import SummaryWriter
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
+#from tensorboardX import SummaryWriter
 
 
 def __common_initialize(args):
