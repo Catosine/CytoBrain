@@ -40,7 +40,25 @@ class NNTrainer:
         self.logging = logging
         self.save_path = save_path
 
-    def run(self, train_loader, val_loader, epoch=100, report_step=20):
+    def eval(self, val_loader):
+
+        # validating
+        dev_loss = list()
+        dev_pred = list()
+        dev_fmri = list()
+        for img, fmri, caption in tqdm(val_loader):
+
+            pred, _, loss = self.__batch_val(img, fmri, caption)
+            dev_pred.append(pred)
+            dev_fmri.append(fmri)
+            dev_loss.append(loss)
+
+        dev_score = self.scoring_fn(
+            torch.concat(dev_pred), torch.concat(dev_fmri))
+
+        return dev_score, torch.concat(dev_loss)
+
+    def run(self, train_loader, val_loader, epoch=100, report_step=20, eval_step=0, early_stopping=0):
         """
             Standard Training and validation
 
@@ -49,11 +67,14 @@ class NNTrainer:
                 val_loader,         torch.utils.dataset.data.Dataset, the validation set
                 epoch,              int, maximized training epoch
                 report_step,        int, report step
+                eval_step,          int, evaluation step, 0 = evaluate every epoch, N for N > 1 = evaulate N steps
+                early_stopping,     int, early stopped after K non-improving evaluation steps
         """
 
         train_step = 0
         dev_step = 0
-        best_score = -1
+        best_score = 0
+        stopping_counter = 0
         self.logging.info("Start training")
 
         for e in range(epoch):
@@ -79,46 +100,74 @@ class NNTrainer:
                     self.logging.info(
                         "[Training @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(train_step, loss, score.mean(), score.median()))
 
+                if train_step % eval_step == 0:
+
+                    # evaluate
+                    dev_score, dev_loss = self.eval(val_loader)
+                    self.logging.info("[Validating @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
+                        train_step, dev_loss.mean(), dev_score.mean(), dev_score.median()))
+
+                    if dev_score.median() > best_score:
+                        # find new best evaluation
+                        stopping_counter = 0
+                        best_score = dev_score.median()
+                        self.logging.info(
+                            "New best model found @ Step#{}.".format(train_step))
+                        torch.save(self.model.state_dict(), osp.join(
+                            self.save_path, "checkpoint_best.pt"))
+                    elif early_stopping and stopping_counter < early_stopping:
+                        # update early stopping counter
+                        stopping_counter += 1
+
+                        if stopping_counter >= early_stopping:
+                            # trigger early stopping
+                            self.logging.info(
+                                "Early stopping triggered. The training process is stopped.")
+                            return
+                    else:
+                        # no early stopping involved. The training will continue
+                        continue
+
             torch.save(self.model.state_dict(), osp.join(
                 self.save_path, "checkpoint_epoch_{}.pt".format(e)))
 
-            # validating
-            dev_loss = list()
-            dev_pred = list()
-            dev_fmri = list()
-            for img, fmri, caption in tqdm(val_loader):
+            # # validating
+            # dev_loss = list()
+            # dev_pred = list()
+            # dev_fmri = list()
+            # for img, fmri, caption in tqdm(val_loader):
 
-                pred, score, loss = self.__batch_val(img, fmri, caption)
-                dev_pred.append(pred)
-                dev_fmri.append(fmri)
-                dev_loss.append(loss)
+            #     pred, score, loss = self.__batch_val(img, fmri, caption)
+            #     dev_pred.append(pred)
+            #     dev_fmri.append(fmri)
+            #     dev_loss.append(loss)
 
-                self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
-                self.summarywriter.add_scalar(
-                    "dev/batch/avg. score", score.mean(), dev_step)
-                self.summarywriter.add_scalar(
-                    "dev/batch/median score", score.median(), dev_step)
+            #     self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
+            #     self.summarywriter.add_scalar(
+            #         "dev/batch/avg. score", score.mean(), dev_step)
+            #     self.summarywriter.add_scalar(
+            #         "dev/batch/median score", score.median(), dev_step)
 
-                dev_step += 1
+            #     dev_step += 1
 
-            dev_score = self.scoring_fn(
-                torch.concat(dev_pred), torch.concat(dev_fmri))
+            # dev_score = self.scoring_fn(
+            #     torch.concat(dev_pred), torch.concat(dev_fmri))
 
-            self.summarywriter.add_scalar(
-                "dev/epoch/avg. score", dev_score.mean(), e)
-            self.summarywriter.add_scalar(
-                "dev/epoch/median score", dev_score.median(), e)
+            # self.summarywriter.add_scalar(
+            #     "dev/epoch/avg. score", dev_score.mean(), e)
+            # self.summarywriter.add_scalar(
+            #     "dev/epoch/median score", dev_score.median(), e)
 
-            dev_loss = torch.stack(dev_loss).mean()
+            # dev_loss = torch.stack(dev_loss).mean()
 
-            self.logging.info(
-                "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(e, dev_loss, dev_score.mean(), dev_score.median()))
+            # self.logging.info(
+            #     "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(e, dev_loss, dev_score.mean(), dev_score.median()))
 
-            if dev_score.median() > best_score:
-                best_score = dev_score.median()
-                self.logging.info("New best model found @ Epoch#{}.".format(e))
-                torch.save(self.model.state_dict(), osp.join(
-                    self.save_path, "checkpoint_best.pt"))
+            # if dev_score.median() > best_score:
+            #     best_score = dev_score.median()
+            #     self.logging.info("New best model found @ Epoch#{}.".format(e))
+            #     torch.save(self.model.state_dict(), osp.join(
+            #         self.save_path, "checkpoint_best.pt"))
 
         self.logging.info("Done.")
 
@@ -129,7 +178,8 @@ class NNTrainer:
         # load data to device
         device = next(self.model.parameters()).device
 
-        pixel_values = self.feature_extractor(img, return_tensors="pt")["pixel_values"]
+        pixel_values = self.feature_extractor(
+            img, return_tensors="pt")["pixel_values"]
         pixel_values = pixel_values.to(device)
 
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
@@ -137,7 +187,8 @@ class NNTrainer:
         labels = self.tokenizer(
             caption, return_tensors="pt", padding=True).input_ids.to(device)
 
-        pred = self.model(pixel_values=pixel_values, labels=labels, output_hidden_states=True)
+        pred = self.model(pixel_values=pixel_values,
+                          labels=labels, output_hidden_states=True)
         loss = self.criterion(pred, fmri)
         score = self.scoring_fn(pred, fmri)
 
@@ -157,7 +208,8 @@ class NNTrainer:
         # load data to device
         device = next(self.model.parameters()).device
 
-        pixel_values = self.feature_extractor(img, return_tensors="pt")["pixel_values"]
+        pixel_values = self.feature_extractor(
+            img, return_tensors="pt")["pixel_values"]
         pixel_values = pixel_values.to(device)
 
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
@@ -199,10 +251,12 @@ class NNTrainer:
         for img, _, caption in tqdm(dataloader):
             model.eval()
 
-            pixel_values = feature_extractor(img, return_tensors="pt")["pixel_values"]
+            pixel_values = feature_extractor(img, return_tensors="pt")[
+                "pixel_values"]
             pixel_values = pixel_values.to(device)
 
-            labels = tokenizer(caption, return_tensors="pt").input_ids.to(device)
+            labels = tokenizer(
+                caption, return_tensors="pt").input_ids.to(device)
 
             with torch.no_grad():
                 pred = model(pixel_values=pixel_values,
