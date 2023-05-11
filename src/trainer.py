@@ -143,7 +143,7 @@ class NNTrainer:
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
 
         labels = self.tokenizer(
-            caption, return_tensors="pt", padding=True).input_ids
+            caption, return_tensors="pt", padding=True).input_ids.to(device)
 
         pred = self.model(pixel_values=pixel_values, labels=labels, output_hidden_states=True)
         loss = self.criterion(pred, fmri)
@@ -171,7 +171,7 @@ class NNTrainer:
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
 
         labels = self.tokenizer(
-            caption, return_tensors="pt", padding=True).input_ids
+            caption, return_tensors="pt", padding=True).input_ids.to(device)
 
         with torch.no_grad():
             pred = self.model(pixel_values=pixel_values,
@@ -210,7 +210,7 @@ class NNTrainer:
             pixel_values = feature_extractor(img, return_tensors="pt")["pixel_values"]
             pixel_values = pixel_values.to(device)
 
-            labels = tokenizer(caption, return_tensors="pt").input_ids
+            labels = tokenizer(caption, return_tensors="pt").input_ids.to(device)
 
             with torch.no_grad():
                 pred = model(pixel_values=pixel_values,
