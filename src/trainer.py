@@ -76,7 +76,6 @@ class NNTrainer:
         """
 
         train_step = 0
-        #dev_step = 0
         best_score = 0
         stopping_counter = 0
         self.logging.info("Start training")
