@@ -188,33 +188,6 @@ class NNTrainer:
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
 
 
-    def __batch_val(self, img, fmri, caption):
-
-        self.model.eval()
-
-        # load data to device
-        device = next(self.model.parameters()).device
-
-        fmri = torch.FloatTensor(np.stack(fmri)).to(device)
-
-        pixel_values = self.feature_extractor(
-            img, return_tensors="pt")["pixel_values"]
-        pixel_values = pixel_values.to(device)
-
-        labels = self.tokenizer(
-            caption, return_tensors="pt", padding=True).input_ids.to(device)
-
-        with torch.no_grad():
-            pred = self.model(pixel_values=pixel_values,
-                            labels=labels, output_hidden_states=True)
-
-        # compute loss and score
-        loss = self.criterion(pred, fmri)
-        score = self.scoring_fn(pred, fmri)
-
-        return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
-
-
     @staticmethod
     def infer(model, feature_extractor, tokenizer, dataset, batch_size=64, num_workers=4):
         """
