@@ -43,13 +43,27 @@ class NNTrainer:
     def eval(self, val_loader):
 
         # validating
-        dev_loss = list()
         dev_pred = list()
         dev_fmri = list()
         
         for img, fmri, caption in tqdm(val_loader):
 
-            pred = self.__forward(img, caption, train=False).detach().cpu()
+            self.model.eval()
+
+            # load data to device
+            device = next(self.model.parameters()).device
+
+            pixel_values = self.feature_extractor(
+                img, return_tensors="pt")["pixel_values"]
+            pixel_values = pixel_values.to(device)
+
+            labels = self.tokenizer(
+                caption, return_tensors="pt", padding=True).input_ids.to(device)
+
+            with torch.no_grad():
+                pred = self.model(pixel_values=pixel_values,
+                                labels=labels, output_hidden_states=True)
+
             dev_pred.append(pred)
             dev_fmri.append(fmri)
 
@@ -142,12 +156,22 @@ class NNTrainer:
 
     def __batch_train(self, img, fmri, caption):
         
-        # run the model
-        pred = self.__forward(img, caption, train=True)
+        self.model.train()
 
-        # prepare the frmi
+        # load data to device
         device = next(self.model.parameters()).device
+
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
+
+        pixel_values = self.feature_extractor(
+            img, return_tensors="pt")["pixel_values"]
+        pixel_values = pixel_values.to(device)
+
+        labels = self.tokenizer(
+            caption, return_tensors="pt", padding=True).input_ids.to(device)
+
+        pred = self.model(pixel_values=pixel_values,
+                            labels=labels, output_hidden_states=True)
 
         # compute loss and score
         loss = self.criterion(pred, fmri)
@@ -194,12 +218,24 @@ class NNTrainer:
 
     def __batch_val(self, img, fmri, caption):
 
-        # run the model
-        pred = self.__forward(img, caption, train=False).detach().cpu()
+        
+        self.model.eval()
 
-        # prepare the frmi
+        # load data to device
         device = next(self.model.parameters()).device
+
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
+
+        pixel_values = self.feature_extractor(
+            img, return_tensors="pt")["pixel_values"]
+        pixel_values = pixel_values.to(device)
+
+        labels = self.tokenizer(
+            caption, return_tensors="pt", padding=True).input_ids.to(device)
+
+        with torch.no_grad():
+            pred = self.model(pixel_values=pixel_values,
+                            labels=labels, output_hidden_states=True)
 
         # compute loss and score
         loss = self.criterion(pred, fmri)
