@@ -49,7 +49,7 @@ class NNTrainer:
         
         for img, fmri, caption in tqdm(val_loader):
 
-            pred = self.__forward(img, caption, train=False)
+            pred = self.__forward(img, caption, train=False).detach().cpu()
             dev_pred.append(pred)
             dev_fmri.append(fmri)
 
@@ -190,13 +190,13 @@ class NNTrainer:
                 pred = self.model(pixel_values=pixel_values,
                                 labels=labels, output_hidden_states=True)
 
-        return pred.detach().cpu()
+        return pred
 
 
     def __batch_val(self, img, fmri, caption):
 
         # run the model
-        pred = self.__forward(img, caption, train=False)
+        pred = self.__forward(img, caption, train=False).detach().cpu()
 
         # prepare the frmi
         device = next(self.model.parameters()).device
