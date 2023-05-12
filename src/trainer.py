@@ -74,7 +74,7 @@ class NNTrainer:
         loss = self.criterion(dev_pred, fmri)
         score = self.scoring_fn(dev_pred, fmri)
 
-        return loss, score
+        return score, loss
 
     def run(self, train_loader, val_loader, epoch=100, report_step=20, eval_step=0, early_stopping=0):
         """
@@ -120,7 +120,7 @@ class NNTrainer:
                 if train_step % eval_step == 0:
 
                     # evaluate
-                    dev_loss, dev_score = self.eval(val_loader)
+                    dev_score, dev_loss = self.eval(val_loader)
                     self.logging.info("[Validating @ Step#{}]\tLoss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
                         train_step, dev_loss, dev_score.mean(), dev_score.median()))
                     
@@ -186,39 +186,10 @@ class NNTrainer:
         self.model.zero_grad()
 
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
-    
-
-    def __forward(self, img, caption, train=True):
-
-        if train:
-            self.model.train()
-        else:
-            self.model.eval()
-
-        # load data to device
-        device = next(self.model.parameters()).device
-
-        pixel_values = self.feature_extractor(
-            img, return_tensors="pt")["pixel_values"]
-        pixel_values = pixel_values.to(device)
-
-        labels = self.tokenizer(
-            caption, return_tensors="pt", padding=True).input_ids.to(device)
-
-        if train:
-            pred = self.model(pixel_values=pixel_values,
-                              labels=labels, output_hidden_states=True)
-        else:
-            with torch.no_grad():
-                pred = self.model(pixel_values=pixel_values,
-                                labels=labels, output_hidden_states=True)
-
-        return pred
 
 
     def __batch_val(self, img, fmri, caption):
 
-        
         self.model.eval()
 
         # load data to device
