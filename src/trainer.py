@@ -52,6 +52,7 @@ class NNTrainer:
 
             # load data to device
             device = next(self.model.parameters()).device
+            fmri = torch.FloatTensor(np.stack(fmri)).to(device)
 
             pixel_values = self.feature_extractor(
                 img, return_tensors="pt")["pixel_values"]
@@ -71,8 +72,8 @@ class NNTrainer:
         dev_fmri = torch.concat(dev_fmri)
 
         # compute loss and score
-        loss = self.criterion(dev_pred, fmri)
-        score = self.scoring_fn(dev_pred, fmri)
+        loss = self.criterion(dev_pred, dev_fmri)
+        score = self.scoring_fn(dev_pred, dev_fmri)
 
         return score, loss
 
