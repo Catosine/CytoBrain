@@ -46,17 +46,21 @@ class NNTrainer:
         dev_loss = list()
         dev_pred = list()
         dev_fmri = list()
+        
         for img, fmri, caption in tqdm(val_loader):
 
-            pred, _, loss = self.__batch_val(img, fmri, caption)
+            pred = self.__forward(img, caption, train=False)
             dev_pred.append(pred)
             dev_fmri.append(fmri)
-            dev_loss.append(loss)
 
-        dev_score = self.scoring_fn(
-            torch.concat(dev_pred), torch.concat(dev_fmri))
+        dev_pred = torch.concat(dev_pred)
+        dev_fmri = torch.concat(dev_fmri)
 
-        return dev_score, torch.concat(dev_loss)
+        # compute loss and score
+        loss = self.criterion(dev_pred, fmri)
+        score = self.scoring_fn(dev_pred, fmri)
+
+        return loss, score
 
     def run(self, train_loader, val_loader, epoch=100, report_step=20, eval_step=0, early_stopping=0):
         """
@@ -72,7 +76,7 @@ class NNTrainer:
         """
 
         train_step = 0
-        dev_step = 0
+        #dev_step = 0
         best_score = 0
         stopping_counter = 0
         self.logging.info("Start training")
@@ -103,9 +107,13 @@ class NNTrainer:
                 if train_step % eval_step == 0:
 
                     # evaluate
-                    dev_score, dev_loss = self.eval(val_loader)
-                    self.logging.info("[Validating @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
-                        train_step, dev_loss.mean(), dev_score.mean(), dev_score.median()))
+                    dev_loss, dev_score = self.eval(val_loader)
+                    self.logging.info("[Validating @ Step#{}]\tLoss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
+                        train_step, dev_loss, dev_score.mean(), dev_score.median()))
+                    
+                    self.summarywriter.add_scalar("dev/loss", dev_loss, train_step)
+                    self.summarywriter.add_scalar("dev/avg. score", dev_score.mean(), train_step)
+                    self.summarywriter.add_scalar("dev/median score", dev_score.median(), train_step)
 
                     if dev_score.median() > best_score:
                         # find new best evaluation
@@ -131,79 +139,38 @@ class NNTrainer:
             torch.save(self.model.state_dict(), osp.join(
                 self.save_path, "checkpoint_epoch_{}.pt".format(e)))
 
-            # # validating
-            # dev_loss = list()
-            # dev_pred = list()
-            # dev_fmri = list()
-            # for img, fmri, caption in tqdm(val_loader):
-
-            #     pred, score, loss = self.__batch_val(img, fmri, caption)
-            #     dev_pred.append(pred)
-            #     dev_fmri.append(fmri)
-            #     dev_loss.append(loss)
-
-            #     self.summarywriter.add_scalar("dev/batch/loss", loss, dev_step)
-            #     self.summarywriter.add_scalar(
-            #         "dev/batch/avg. score", score.mean(), dev_step)
-            #     self.summarywriter.add_scalar(
-            #         "dev/batch/median score", score.median(), dev_step)
-
-            #     dev_step += 1
-
-            # dev_score = self.scoring_fn(
-            #     torch.concat(dev_pred), torch.concat(dev_fmri))
-
-            # self.summarywriter.add_scalar(
-            #     "dev/epoch/avg. score", dev_score.mean(), e)
-            # self.summarywriter.add_scalar(
-            #     "dev/epoch/median score", dev_score.median(), e)
-
-            # dev_loss = torch.stack(dev_loss).mean()
-
-            # self.logging.info(
-            #     "[Validating @ Epoch#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(e, dev_loss, dev_score.mean(), dev_score.median()))
-
-            # if dev_score.median() > best_score:
-            #     best_score = dev_score.median()
-            #     self.logging.info("New best model found @ Epoch#{}.".format(e))
-            #     torch.save(self.model.state_dict(), osp.join(
-            #         self.save_path, "checkpoint_best.pt"))
-
         self.logging.info("Done.")
 
     def __batch_train(self, img, fmri, caption):
+        
+        # run the model
+        pred = self.__forward(img, caption, train=True)
 
-        self.model.train()
-
-        # load data to device
+        # prepare the frmi
         device = next(self.model.parameters()).device
-
-        pixel_values = self.feature_extractor(
-            img, return_tensors="pt")["pixel_values"]
-        pixel_values = pixel_values.to(device)
-
         fmri = torch.FloatTensor(np.stack(fmri)).to(device)
 
-        labels = self.tokenizer(
-            caption, return_tensors="pt", padding=True).input_ids.to(device)
-
-        pred = self.model(pixel_values=pixel_values,
-                          labels=labels, output_hidden_states=True)
+        # compute loss and score
         loss = self.criterion(pred, fmri)
         score = self.scoring_fn(pred, fmri)
 
+        # backprop
         loss.backward()
-
         self.optimizer.step()
         self.scheduler.step()
 
+        # clean-up
         self.model.zero_grad()
 
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
+    
 
-    def __batch_val(self, img, fmri, caption):
+    def __forward(self, img, caption, train=True):
 
-        self.model.eval()
+        if train:
+            self.model.train()
+        else:
+            self.model.eval()
 
         # load data to device
         device = next(self.model.parameters()).device
@@ -212,18 +179,35 @@ class NNTrainer:
             img, return_tensors="pt")["pixel_values"]
         pixel_values = pixel_values.to(device)
 
-        fmri = torch.FloatTensor(np.stack(fmri)).to(device)
-
         labels = self.tokenizer(
             caption, return_tensors="pt", padding=True).input_ids.to(device)
 
-        with torch.no_grad():
+        if train:
             pred = self.model(pixel_values=pixel_values,
                               labels=labels, output_hidden_states=True)
-            loss = self.criterion(pred, fmri)
-            score = self.scoring_fn(pred, fmri)
+        else:
+            with torch.no_grad():
+                pred = self.model(pixel_values=pixel_values,
+                                labels=labels, output_hidden_states=True)
+
+        return pred.detach().cpu()
+
+
+    def __batch_val(self, img, fmri, caption):
+
+        # run the model
+        pred = self.__forward(img, caption, train=False)
+
+        # prepare the frmi
+        device = next(self.model.parameters()).device
+        fmri = torch.FloatTensor(np.stack(fmri)).to(device)
+
+        # compute loss and score
+        loss = self.criterion(pred, fmri)
+        score = self.scoring_fn(pred, fmri)
 
         return pred.detach().cpu(), score.detach().cpu(), loss.detach().cpu()
+
 
     @staticmethod
     def infer(model, feature_extractor, tokenizer, dataset, batch_size=64, num_workers=4):
@@ -249,6 +233,7 @@ class NNTrainer:
         device = next(model.parameters()).device
 
         for img, _, caption in tqdm(dataloader):
+
             model.eval()
 
             pixel_values = feature_extractor(img, return_tensors="pt")[
