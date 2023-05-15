@@ -104,7 +104,7 @@ class NNTrainer:
             for img, fmri, caption in tqdm(train_loader):
 
                 _, score, loss = self.__batch_train(img, fmri, caption)
-
+                continue
                 self.summarywriter.add_scalar(
                     "train/batch/loss", loss, train_step)
                 self.summarywriter.add_scalar(
