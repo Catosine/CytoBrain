@@ -341,7 +341,7 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         # construct regression embeddings
         # regression_embeds = build_regression_feats(
         #     decoder_embeds=decoder_outputs.hidden_states, encoder_embeds=encoder_outputs.hidden_states if self.use_both_encoder_decoder_features else None, method=self.regressor_feature_method)
-        regression_logits = self.regressor(torch.concat([decoder_outputs.output_hidden_states[-1].mean(1), encoder_outputs.output_hidden_states[-1].mean(1)], axis=1))
+        regression_logits = self.regressor(torch.concat([decoder_outputs.output_hidden_states[-1].mean(1), encoder_outputs.hidden_states[-1].mean(1)], axis=1))
 
         return regression_logits
 
