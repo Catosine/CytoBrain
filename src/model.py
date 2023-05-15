@@ -63,9 +63,8 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
 
         regressor_out_features = config.regressor_out_features if regressor_out_features is None else regressor_out_features
         regressor_dropout_prob = config.regressor_dropout_prob if regressor_dropout_prob is None else regressor_dropout_prob
-        # regressor_in_features = 2 * \
-        #     config.decoder.hidden_size if use_both_encoder_decoder_features else config.decoder.hidden_size
-        regressor_in_features = 768
+        regressor_in_features = 2 * \
+            config.decoder.hidden_size if use_both_encoder_decoder_features else config.decoder.hidden_size
 
         self.regressor_feature_method = regressor_feature_method
         self.use_both_encoder_decoder_features = use_both_encoder_decoder_features
@@ -342,7 +341,7 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         # construct regression embeddings
         # regression_embeds = build_regression_feats(
         #     decoder_embeds=decoder_outputs.hidden_states, encoder_embeds=encoder_outputs.hidden_states if self.use_both_encoder_decoder_features else None, method=self.regressor_feature_method)
-        regression_logits = self.regressor(decoder_outputs.output_hidden_states[-1].mean(1))
+        regression_logits = self.regressor(torch.concat([decoder_outputs.output_hidden_states[-1].mean(1), encoder_outputs.output_hidden_states[-1].mean(1)], axis=1))
 
         return regression_logits
 
