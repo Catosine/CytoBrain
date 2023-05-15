@@ -62,7 +62,7 @@ class NNTrainer:
                 caption, return_tensors="pt", padding=True).input_ids.to(device)
 
             with torch.no_grad():
-                pred = self.model(pixel_values=pixel_values,
+                pred, aux_loss = self.model(pixel_values=pixel_values,
                                 labels=labels, output_hidden_states=True)
 
             dev_pred.append(pred)
@@ -72,7 +72,7 @@ class NNTrainer:
         dev_fmri = torch.concat(dev_fmri)
 
         # compute loss and score
-        loss = self.criterion(dev_pred, dev_fmri)
+        loss = self.criterion(dev_pred, dev_fmri) + (aux_loss * 0.1)
         score = self.scoring_fn(dev_pred, dev_fmri)
 
         return score, loss
@@ -168,11 +168,11 @@ class NNTrainer:
         labels = self.tokenizer(
             caption, return_tensors="pt", padding=True).input_ids.to(device)
 
-        pred = self.model(pixel_values=pixel_values,
+        pred, aux_loss = self.model(pixel_values=pixel_values,
                             labels=labels, output_hidden_states=True)
 
         # compute loss and score
-        loss = self.criterion(pred, fmri)
+        loss = self.criterion(pred, fmri) + (aux_loss * 0.1)
         score = self.scoring_fn(pred, fmri)
 
         # backprop
@@ -221,7 +221,7 @@ class NNTrainer:
                 caption, return_tensors="pt").input_ids.to(device)
 
             with torch.no_grad():
-                pred = model(pixel_values=pixel_values,
+                pred, _ = model(pixel_values=pixel_values,
                              labels=labels, output_hidden_states=True)
                 results.append(pred.detach())
 

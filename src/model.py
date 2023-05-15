@@ -343,15 +343,15 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         #     decoder_embeds=decoder_outputs.hidden_states, encoder_embeds=encoder_outputs.hidden_states if self.use_both_encoder_decoder_features else None, method=self.regressor_feature_method)
         regression_logits = self.regressor(torch.concat([decoder_outputs.hidden_states[-1].mean(1), encoder_outputs.hidden_states[-1].mean(1)], axis=1))
 
-        return regression_logits
-
-        # # Compute loss independent from decoder (as some shift the logits inside them)
-        # loss = None
-        # if labels is not None:
-        #     logits = decoder_outputs.logits if return_dict else decoder_outputs[0]
-        #     loss_fct = CrossEntropyLoss()
-        #     loss = loss_fct(
-        #         logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
+        # Compute loss independent from decoder (as some shift the logits inside them)
+        loss = None
+        if labels is not None:
+            logits = decoder_outputs.logits if return_dict else decoder_outputs[0]
+            loss_fct = CrossEntropyLoss()
+            loss = loss_fct(
+                logits.reshape(-1, self.decoder.config.vocab_size), labels.reshape(-1))
+        
+        return regression_logits, loss
 
         # if regression_target is not None:
         #     reg_loss_fct = MSELoss()
