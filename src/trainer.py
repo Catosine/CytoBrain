@@ -77,7 +77,7 @@ class NNTrainer:
 
         return score, loss
 
-    def run(self, train_loader, val_loader, epoch=100, report_step=20, eval_step=0, early_stopping=0):
+    def run(self, train_loader, val_loader, epoch=100, report_step=20, early_stopping=0):
         """
             Standard Training and validation
 
@@ -86,7 +86,6 @@ class NNTrainer:
                 val_loader,         torch.utils.dataset.data.Dataset, the validation set
                 epoch,              int, maximized training epoch
                 report_step,        int, report step
-                eval_step,          int, evaluation step, 0 = evaluate every epoch, N for N > 1 = evaulate N steps
                 early_stopping,     int, early stopped after K non-improving evaluation steps
         """
 
@@ -104,7 +103,7 @@ class NNTrainer:
             for img, fmri, caption in tqdm(train_loader):
 
                 _, score, loss = self.__batch_train(img, fmri, caption)
-                continue
+                
                 self.summarywriter.add_scalar(
                     "train/batch/loss", loss, train_step)
                 self.summarywriter.add_scalar(
@@ -118,37 +117,35 @@ class NNTrainer:
                     self.logging.info(
                         "[Training @ Step#{}]\tAvg. Loss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(train_step, loss, score.mean(), score.median()))
 
-                if train_step % eval_step == 0:
+            # evaluate
+            dev_score, dev_loss = self.eval(val_loader)
+            self.logging.info("[Validating @ Epoch#{}]\tLoss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
+                train_step, dev_loss, dev_score.mean(), dev_score.median()))
+            
+            self.summarywriter.add_scalar("dev/loss", dev_loss, train_step)
+            self.summarywriter.add_scalar("dev/avg. score", dev_score.mean(), train_step)
+            self.summarywriter.add_scalar("dev/median score", dev_score.median(), train_step)
 
-                    # evaluate
-                    dev_score, dev_loss = self.eval(val_loader)
-                    self.logging.info("[Validating @ Step#{}]\tLoss: {:.3f}\tAvg. Score: {:.3f}\tMedian Score: {:.3f}".format(
-                        train_step, dev_loss, dev_score.mean(), dev_score.median()))
-                    
-                    self.summarywriter.add_scalar("dev/loss", dev_loss, train_step)
-                    self.summarywriter.add_scalar("dev/avg. score", dev_score.mean(), train_step)
-                    self.summarywriter.add_scalar("dev/median score", dev_score.median(), train_step)
+            if dev_score.median() > best_score:
+                # find new best evaluation
+                stopping_counter = 0
+                best_score = dev_score.median()
+                self.logging.info(
+                    "New best model found @ Epoch#{}.".format(e))
+                torch.save(self.model.state_dict(), osp.join(
+                    self.save_path, "checkpoint_best.pt"))
+            elif early_stopping and stopping_counter < early_stopping:
+                # update early stopping counter
+                stopping_counter += 1
 
-                    if dev_score.median() > best_score:
-                        # find new best evaluation
-                        stopping_counter = 0
-                        best_score = dev_score.median()
-                        self.logging.info(
-                            "New best model found @ Step#{}.".format(train_step))
-                        torch.save(self.model.state_dict(), osp.join(
-                            self.save_path, "checkpoint_best.pt"))
-                    elif early_stopping and stopping_counter < early_stopping:
-                        # update early stopping counter
-                        stopping_counter += 1
-
-                        if stopping_counter >= early_stopping:
-                            # trigger early stopping
-                            self.logging.info(
-                                "Early stopping triggered. The training process is stopped.")
-                            return
-                    else:
-                        # no early stopping involved. The training will continue
-                        continue
+                if stopping_counter >= early_stopping:
+                    # trigger early stopping
+                    self.logging.info(
+                        "Early stopping triggered. The training process is stopped.")
+                    return
+            else:
+                # no early stopping involved. The training will continue
+                continue
 
             torch.save(self.model.state_dict(), osp.join(
                 self.save_path, "checkpoint_epoch_{}.pt".format(e)))

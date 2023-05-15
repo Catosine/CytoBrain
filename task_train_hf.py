@@ -80,7 +80,7 @@ def main(args):
                         scheduler, args.summarywriter, logging, args.save_path)
 
     # start training
-    trainer.run(train_loader, val_loader, args.epoch, args.report_step, args.eval_step, args.early_stopping)
+    trainer.run(train_loader, val_loader, args.epoch, args.report_step, args.early_stopping)
 
 
 if __name__ == "__main__":
