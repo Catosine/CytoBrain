@@ -72,7 +72,7 @@ class NNTrainer:
         dev_fmri = torch.concat(dev_fmri)
 
         # compute loss and score
-        loss = self.criterion(dev_pred, dev_fmri) + (aux_loss * 0.1)
+        loss = self.criterion(dev_pred, dev_fmri)
         score = self.scoring_fn(dev_pred, dev_fmri)
 
         return score, loss
@@ -172,7 +172,7 @@ class NNTrainer:
                             labels=labels, output_hidden_states=True)
 
         # compute loss and score
-        loss = self.criterion(pred, fmri) + (aux_loss * 0)
+        loss = self.criterion(pred, fmri)
         score = self.scoring_fn(pred, fmri)
 
         # backprop
