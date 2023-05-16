@@ -172,7 +172,7 @@ class NNTrainer:
                             labels=labels, output_hidden_states=True)
 
         # compute loss and score
-        loss = self.criterion(pred, fmri) + (aux_loss * 0.1)
+        loss = self.criterion(pred, fmri) + (aux_loss * 0)
         score = self.scoring_fn(pred, fmri)
 
         # backprop

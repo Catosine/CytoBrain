@@ -69,11 +69,12 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         self.regressor_feature_method = regressor_feature_method
         self.use_both_encoder_decoder_features = use_both_encoder_decoder_features
 
-        self.regressor = nn.Sequential(
-            FCN(in_features=regressor_in_features,
-                out_features=2048, p=regressor_dropout_prob),
-            nn.Linear(in_features=2048, out_features=regressor_out_features)
-        )
+        # self.regressor = nn.Sequential(
+        #     FCN(in_features=regressor_in_features,
+        #         out_features=2048, p=regressor_dropout_prob),
+        #     nn.Linear(in_features=2048, out_features=regressor_out_features)
+        # )
+        self.regressor = nn.Linear(in_features=regressor_in_features, out_features=regressor_out_features)
 
     @classmethod
     def from_encoder_decoder_pretrained(
@@ -250,7 +251,6 @@ class VisionEncoderDecoderRegressor(VisionEncoderDecoderModel):
         decoder_inputs_embeds: Optional[torch.FloatTensor] = None,
         labels: Optional[torch.LongTensor] = None,
         regression_target: Optional[torch.FloatTensor] = None,
-        loss_alpha: Optional[float] = 0.5,
         use_cache: Optional[bool] = None,
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
