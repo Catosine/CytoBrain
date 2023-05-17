@@ -43,10 +43,10 @@ def main(args):
     tf = __build_transform(args.subject, args.train)
 
     # setup model
-    model = build_model(args.model, 100, args.pretrained_weight)
+    model = build_model(args.model, 100, args.pretrained_weights)
     model = create_feature_extractor(model, return_nodes=args.layers)
 
-    print("Pretrained model loaded from {}".format(args.pretrained_weight))
+    print("Pretrained model loaded from {}".format(args.pretrained_weights))
     model.to(args.device)
     print("Model initialized. Loaded to <{}> device.".format(args.device))
 

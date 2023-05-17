@@ -84,7 +84,7 @@ def extract_initialize(args):
     __common_initialize(args)
 
     args.save_path = osp.join(
-        args.save_path, args.pretrained_weight.split("/")[-1].split(".")[0])
+        args.save_path, args.pretrained_weights.split("/")[-1].split(".")[0])
     if args.note:
         args.save_path += "_{}".format(args.note)
 
