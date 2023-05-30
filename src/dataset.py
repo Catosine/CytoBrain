@@ -12,6 +12,7 @@
 import os
 import os.path as osp
 import json
+from typing import List
 
 import cv2
 from PIL import Image
@@ -24,13 +25,13 @@ class Algonauts2023Raw(Dataset):
         Load original data for Algonauts2023 dataset
     """
 
-    def __init__(self, 
-                 data_path: str, 
+    def __init__(self,
+                 data_path: str,
                  caption_file: str = None,
-                 hemisphere: str = "L", 
-                 transform = None, 
-                 train: bool = True, 
-                 return_img_ids: bool = False, 
+                 hemisphere: str = "L",
+                 transform=None,
+                 train: bool = True,
+                 return_img_ids: bool = False,
                  return_pil: bool = False):
         """
             Initialize a torch.utils.data.Dataset object for algonauts2023 dataset
@@ -110,13 +111,13 @@ class Algonauts2023Raw(Dataset):
 
         if self.return_pil:
             img = Image.open(osp.join(self.feature_path, feat_file))
-            
+
             if img.mode != "RGB":
                 img = img.convert(mode="RGB")
 
         else:
             img = cv2.imread(osp.join(self.feature_path, feat_file)
-                            ).astype(np.float32)
+                             ).astype(np.float32)
 
             # convert BGR to RGB
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -185,7 +186,6 @@ class Algonauts2023Feature(Dataset):
             self.dataset = sorted(self.dataset, key=lambda x: int(
                 x.split("_")[0].split("-")[-1]) - 1)
 
-
     def __len__(self):
         return len(self.dataset)
 
@@ -211,63 +211,37 @@ class Algonauts2023Feature(Dataset):
         return feature, self.fmri[feat_idx] if self.train else 0
 
 
-def get_features(data_path: str, extractor: str, layer: list, train: bool = True):
+def __get_img_features(path: str):
 
-    path_struct = osp.join(data_path, "{}_split")
+    all_files = os.listdir(path)
 
-    if train:
-        shared_path = osp.join(
-            path_struct.format("training"), "training_{}")
-        fmri_path = shared_path.format("fmri")
-        print("Using fMRI from: {}".format(fmri_path))
-
-        lfmri = np.load(osp.join(fmri_path, "lh_training_fmri.npy"))
-        rfmri = np.load(osp.join(fmri_path, "rh_training_fmri.npy"))
-
-        feature_path = shared_path.format("features")
-
-    else:
-        feature_path = osp.join(
-            path_struct.format("test"), "test_features")
-
-    print("Using data from: {}".format(feature_path))
-
-    # get all file names
-    img_files = os.listdir(osp.join(feature_path, extractor, layer[0]))
-
-    # sorted in ascending order if not train
-    if not train:
-        img_files = sorted(img_files, key=lambda x: int(
-                x.split("_")[0].split("-")[-1]) - 1)
+    # sort by file ID
+    all_files = sorted(all_files, key=lambda x: int(
+        x.split("_")[0].split("-")[-1]) - 1)
 
     features = list()
-    lfmris = list()
-    rfmris = list()
-    for img in img_files:
+    for file in all_files:
 
-        # load features from all layers and concat them together
-        feat = np.hstack([np.load(osp.join(feature_path, extractor, l, img)
-                                  ).astype(np.float32) for l in layer])
-        features.append(feat)
+        features.append(np.load(osp.join(path, file)))
 
-        # get fmri id
-        feat_idx = int(img.split("_")[0].split("-")[-1]) - 1
-        lfmris.append(lfmri[feat_idx] if train else np.ones(1))
-        rfmris.append(rfmri[feat_idx] if train else np.ones(1))
+    return np.vstack(features)
 
-    return np.vstack(features), np.vstack(lfmris), np.vstack(rfmris)
+
+def get_features(data_paths: List[str]):
+
+    features = list()
+    for path in data_paths:
+        features.append(__get_img_features(path))
+
+    return np.hstack(features)
 
 
 if __name__ == "__main__":
 
-    dataset = Algonauts2023Raw("../../data.nosync/subj01", return_img_ids=True, caption_file="../../data.nosync/nsd_captions.json")
-    from torch.utils.data import DataLoader
-    loader = DataLoader(dataset, batch_size=2)
+    lst = [
+        "../../data.nosync/subj01/training_split/training_features/vit-gpt2-image-captioning/encoder-last1-pca-512",
+        "../../data.nosync/subj01/training_split/training_features/resnet50-imagenet1k-v2/avgpool"]
 
-    for i, _, cap, id in loader:
-        
-        print(i.shape)
-        print(cap)
-        print(id)
-        break
+    tst = get_features(lst)
 
+    print(tst.shape)
